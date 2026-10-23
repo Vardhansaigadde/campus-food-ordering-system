@@ -42,7 +42,7 @@ public class AuthController {
     public record RegisterRequest(
             @NotBlank @Size(max = 80) String name,
             @NotBlank @Email @Size(max = 120) String email,
-            @Pattern(regexp = "^$|^[0-9]{10}$", message = "must be 10 digits") String phone,
+            @NotBlank @Pattern(regexp = "^[0-9]{10}$", message = "must be 10 digits") String phone,
             @NotBlank @Size(min = 6, max = 64) String password) {
     }
 

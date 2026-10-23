@@ -8,6 +8,9 @@ import { errorMessage } from '../../lib/api'
 import { Spinner } from '../../components/ui'
 import { ADMIN_BASE } from '../../config'
 
+/** Keeps the last 10 digits, so "+91 98765 43210" from autofill becomes 9876543210. */
+const digits10 = (v) => v.replace(/\D/g, '').slice(-10)
+
 export default function Register() {
   const { user, register } = useAuth()
   const navigate = useNavigate()
@@ -48,18 +51,18 @@ export default function Register() {
           <input id="email" type="email" required autoComplete="email" className="input" value={form.email} onChange={set('email')} />
         </div>
         <div>
-          <label className="label" htmlFor="phone">
-            Phone <span className="font-normal text-muted">(optional)</span>
-          </label>
+          <label className="label" htmlFor="phone">Mobile number</label>
           <input
             id="phone"
+            type="tel"
+            required
             inputMode="numeric"
             pattern="[0-9]{10}"
             title="10-digit mobile number"
             autoComplete="tel"
             className="input"
             value={form.phone}
-            onChange={set('phone')}
+            onChange={(e) => setForm({ ...form, phone: digits10(e.target.value) })}
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

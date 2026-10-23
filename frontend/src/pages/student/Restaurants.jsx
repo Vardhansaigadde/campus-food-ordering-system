@@ -1,17 +1,39 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Clock, MapPin, Search, Store, UtensilsCrossed } from 'lucide-react'
+import { ChevronRight, Clock, Coffee, MapPin, Moon, Search, Store, Sun, Sunset, UtensilsCrossed } from 'lucide-react'
 import { api } from '../../lib/api'
 import { useApi, useInterval } from '../../lib/useApi'
 import { money, time } from '../../lib/format'
 import { EmptyState, ErrorBox, FoodImage, PageLoader, Rating, RestaurantStatusBadge, VegMark } from '../../components/ui'
+import { useAuth } from '../../context/AuthContext'
 
 function greeting() {
   const h = new Date().getHours()
-  if (h < 11) return 'Good morning – breakfast time'
-  if (h < 16) return 'Good afternoon – lunch break?'
-  if (h < 19) return 'Snack time'
-  return 'Good evening – dinner time'
+  if (h < 11) return { text: 'Good morning', icon: Coffee }
+  if (h < 16) return { text: 'Good afternoon', icon: Sun }
+  if (h < 19) return { text: 'Good evening', icon: Sunset }
+  return { text: 'Good evening', icon: Moon }
+}
+
+/** Warm covers for canteens without a photo – picked by id so each canteen keeps its colour. */
+const COVERS = [
+  'from-orange-500 to-amber-400',
+  'from-rose-500 to-orange-400',
+  'from-amber-500 to-yellow-400',
+  'from-red-600 to-orange-500',
+  'from-orange-600 to-rose-400',
+]
+
+function Cover({ r }) {
+  if (r.imageUrl) {
+    return <FoodImage src={r.imageUrl} alt={r.name} className="h-full w-full transition-transform duration-500 group-hover:scale-105" kind="restaurant" />
+  }
+  return (
+    <div className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br ${COVERS[r.id % COVERS.length]}`}>
+      <UtensilsCrossed aria-hidden="true" className="absolute -right-4 -bottom-6 h-32 w-32 rotate-12 text-white/15" />
+      <span className="font-display text-5xl font-extrabold tracking-tight text-white drop-shadow-sm">{r.code ?? r.name.slice(0, 2)}</span>
+    </div>
+  )
 }
 
 export default function Restaurants() {
@@ -37,27 +59,32 @@ export default function Restaurants() {
   }, [query])
 
   const byId = Object.fromEntries((data ?? []).map((r) => [r.id, r]))
+  const { user } = useAuth()
+  const firstName = user?.name?.split(' ')[0]
+  const hello = greeting()
 
   return (
     <>
-      {/* Hero block */}
-      <section className="relative mb-8 overflow-hidden rounded-3xl bg-brand-500 p-6 text-white shadow-block-sm sm:p-8 dark:shadow-none">
-        <div aria-hidden="true" className="absolute hidden sm:block -right-10 -top-10 h-40 w-40 rotate-12 rounded-[2rem] bg-white/10" />
-        <div aria-hidden="true" className="absolute hidden sm:block -bottom-8 right-24 h-20 w-20 rounded-full border-4 border-white/20" />
-        <div className="relative max-w-xl">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/85">{greeting()}</p>
-          <h1 className="mt-1 text-3xl font-extrabold leading-tight sm:text-4xl">What would you like to eat?</h1>
-          <p className="mt-2 font-medium text-white/90">Pick a canteen, order, and collect at the counter with your Order ID + OTP.</p>
-          <div className="relative mt-5">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" aria-hidden="true" />
-            <input
-              className="input h-13 rounded-full border-transparent pl-11 text-base shadow-block"
-              placeholder="Search dishes in all canteens – biryani, dosa, coffee…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="Search dishes in all restaurants"
-            />
-          </div>
+      {/* Greeting + search */}
+      <section className="mb-7">
+        <p className="flex items-center gap-2 text-sm font-semibold text-brand">
+          <hello.icon className="h-4 w-4" aria-hidden="true" />
+          {hello.text}{firstName ? `, ${firstName}` : ''}
+        </p>
+        <h1 className="mt-1 text-3xl font-extrabold leading-tight sm:text-4xl">
+          What would you like to <span className="text-brand">eat?</span>
+        </h1>
+        <div className="relative mt-4 max-w-xl">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+          <input
+            type="search"
+            inputMode="search"
+            className="input h-12 rounded-full pl-12"
+            placeholder="Search dishes"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search dishes in all canteens"
+          />
         </div>
       </section>
 
@@ -93,46 +120,53 @@ export default function Restaurants() {
         <EmptyState icon={Store} title="No restaurants yet" text="The canteen office hasn't added any restaurants." />
       ) : (
         <>
-        <h2 className="mb-4 text-2xl font-extrabold">Campus canteens</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {data.map((r, i) => (
-            <Link
-              key={r.id}
-              to={`/restaurants/${r.id}`}
-              style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}
-              className={`blocky group animate-rise overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgb(28_25_23/0.12)] ${r.status === 'CLOSED' ? 'opacity-75 grayscale-[40%]' : ''}`}
-            >
-              <div className="relative">
-                <FoodImage src={r.imageUrl} alt={r.name} className="h-40 w-full border-b border-line dark:border-slate-700" kind="restaurant" />
-                <div className="absolute left-3 top-3">
-                  <RestaurantStatusBadge status={r.status} />
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-xl font-bold group-hover:text-brand">{r.name}</h3>
-                  <Rating value={r.rating} count={r.ratingCount} />
-                </div>
-                {r.description && <p className="mt-1 line-clamp-2 text-sm text-muted">{r.description}</p>}
-                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
-                  {r.location && (
-                    <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {r.location}</span>
+        <h2 className="mb-3 text-lg font-bold">Campus canteens</h2>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {data.map((r, i) => {
+            const closed = r.status === 'CLOSED'
+            return (
+              <Link
+                key={r.id}
+                to={`/restaurants/${r.id}`}
+                style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}
+                className="card group animate-rise overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgb(28_25_23/0.12)] active:scale-[0.99]"
+              >
+                <div className={`relative h-36 overflow-hidden ${closed ? 'grayscale-[70%]' : ''}`}>
+                  <Cover r={r} />
+                  <div className="absolute left-3 top-3 rounded-full bg-white/95 shadow-sm dark:bg-slate-900/90">
+                    <RestaurantStatusBadge status={r.status} />
+                  </div>
+                  {r.dishesToday > 0 && !closed && (
+                    <span className="absolute bottom-3 left-3 rounded-full bg-black/45 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
+                      {r.dishesToday} {r.dishesToday === 1 ? 'dish' : 'dishes'} today
+                    </span>
                   )}
-                  {r.openingHours && (
-                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {r.openingHours}</span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    <UtensilsCrossed className="h-3.5 w-3.5" /> {r.dishesToday} dishes today
-                  </span>
                 </div>
-                {r.status === 'BUSY' && r.busyUntil && (
-                  <p className="mt-3 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-                    Very busy – taking new orders again at {time(r.busyUntil)}
-                  </p>
-                )}
-              </div>
-            </Link>
-          ))}
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-lg font-bold leading-snug">{r.name}</h3>
+                    <Rating value={r.rating} count={r.ratingCount} />
+                  </div>
+                  {r.description && <p className="mt-0.5 line-clamp-1 text-sm text-muted">{r.description}</p>}
+                  <div className="mt-3 flex items-center gap-3 border-t border-line pt-3 text-xs text-muted dark:border-slate-800">
+                    {r.location && (
+                      <span className="flex min-w-0 items-center gap-1"><MapPin className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{r.location}</span></span>
+                    )}
+                    {r.openingHours && (
+                      <span className="flex shrink-0 items-center gap-1"><Clock className="h-3.5 w-3.5" /> {r.openingHours}</span>
+                    )}
+                    <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-brand" aria-hidden="true" />
+                  </div>
+                  {r.status === 'BUSY' && r.busyUntil && (
+                    <p className="mt-3 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
+                      Very busy – taking new orders again at {time(r.busyUntil)}
+                    </p>
+                  )}
+                  {closed && <p className="mt-3 text-xs font-medium text-muted">Closed now – you can still see the menu.</p>}
+                </div>
+              </Link>
+            )
+          })}
         </div>
         </>
       )}
