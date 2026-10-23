@@ -40,6 +40,10 @@
   --animate-pop: pop 0.25s ease-out;
   --animate-rise: rise 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) both;
   --animate-pulse-ring: pulse-ring 1.6s ease-out infinite;
+  /* Login photo slideshow: slow zoom + drift (two directions), and the story progress bar */
+  --animate-kenburns-a: kenburns-a 7s ease-out both;
+  --animate-kenburns-b: kenburns-b 7s ease-out both;
+  --animate-story: story 5.5s linear both;
 
   @keyframes pop {
     0% { transform: scale(0.96); opacity: 0; }
@@ -52,6 +56,18 @@
   @keyframes pulse-ring {
     0% { box-shadow: 0 0 0 0 rgb(194 65 12 / 0.45); }
     100% { box-shadow: 0 0 0 14px rgb(194 65 12 / 0); }
+  }
+  @keyframes kenburns-a {
+    0% { transform: scale(1.02) translate(0, 0); }
+    100% { transform: scale(1.14) translate(-2%, -1.5%); }
+  }
+  @keyframes kenburns-b {
+    0% { transform: scale(1.14) translate(2%, 1%); }
+    100% { transform: scale(1.02) translate(0, 0); }
+  }
+  @keyframes story {
+    0% { width: 0; }
+    100% { width: 100%; }
   }
 }
 
