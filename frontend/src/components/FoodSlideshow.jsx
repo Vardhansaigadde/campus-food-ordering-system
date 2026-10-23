@@ -3,11 +3,10 @@ import { Pause, Play } from 'lucide-react'
 
 /** Lunch photos (free Unsplash licence), 900x1050 WebP, ~65 KB each – kept small for mobile data. */
 const SLIDES = [
-  { src: '/food/biryani.webp', name: 'Dum Biryani' },
-  { src: '/food/meals.webp', name: 'South Indian Meals' },
-  { src: '/food/fried-rice.webp', name: 'Veg Fried Rice' },
-  { src: '/food/paneer.webp', name: 'Paneer Butter Masala' },
-  { src: '/food/chicken-biryani.webp', name: 'Chicken Biryani' },
+  { src: '/food/chicken-dum-biryani.webp', name: 'Chicken Dum Biryani' },
+  { src: '/food/chicken-fried-rice.webp', name: 'Chicken Fried Rice' },
+  { src: '/food/chicken-lollipops.webp', name: 'Chicken Lollipops' },
+  { src: '/food/chicken-fry-piece-biryani.webp', name: 'Chicken Fry Piece Biryani' },
 ]
 
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -93,24 +92,24 @@ export default function FoodSlideshow({ className = '', children }) {
         ))}
       </div>
 
-      {/* Dish name + pause button */}
-      <div className="absolute right-3 top-[max(1.75rem,calc(env(safe-area-inset-top)+0.75rem))] z-20 flex items-center gap-1 lg:right-8 lg:top-12">
-        <p aria-hidden="true" className="inline-flex items-center gap-2 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white backdrop-blur max-[359px]:hidden">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-          {SLIDES[index].name}
-        </p>
-        <button
-          type="button"
-          onClick={() => setStopped((s) => !s)}
-          className="flex h-11 w-11 items-center justify-center rounded-full text-white transition-colors hover:bg-black/40"
-          aria-label={stopped ? 'Play photo slideshow' : 'Pause photo slideshow'}
-          aria-pressed={stopped}
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/55 backdrop-blur">
-            {stopped ? <Play className="h-3.5 w-3.5 fill-current" /> : <Pause className="h-3.5 w-3.5 fill-current" />}
-          </span>
-        </button>
-      </div>
+      {/* Dish name: bottom-left on phones (clear of the logo), top-right on wide screens */}
+      <p aria-hidden="true" className="absolute bottom-11 left-5 z-10 inline-flex items-center gap-2 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white backdrop-blur lg:bottom-auto lg:left-auto lg:right-24 lg:top-14">
+        <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+        {SLIDES[index].name}
+      </p>
+
+      {/* Pause / play */}
+      <button
+        type="button"
+        onClick={() => setStopped((s) => !s)}
+        className="absolute right-3 top-[max(1.75rem,calc(env(safe-area-inset-top)+0.75rem))] z-20 flex h-11 w-11 items-center justify-center rounded-full text-white transition-colors hover:bg-black/40 lg:right-8 lg:top-12"
+        aria-label={stopped ? 'Play photo slideshow' : 'Pause photo slideshow'}
+        aria-pressed={stopped}
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/55 backdrop-blur">
+          {stopped ? <Play className="h-3.5 w-3.5 fill-current" /> : <Pause className="h-3.5 w-3.5 fill-current" />}
+        </span>
+      </button>
 
       <div className="relative z-10 flex h-full flex-col">{children}</div>
     </div>
