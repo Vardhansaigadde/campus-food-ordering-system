@@ -44,6 +44,29 @@ export function unlockAudio() {
   ctx()
 }
 
+/*
+ * "Alerts off" switch for this phone. The browser's permission can't be taken back from a page,
+ * so the app remembers the choice itself (per device) and stays quiet.
+ */
+const MUTE_KEY = 'cf-alerts-off'
+
+export function alertsMuted() {
+  try {
+    return localStorage.getItem(MUTE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function setAlertsMuted(muted) {
+  try {
+    if (muted) localStorage.setItem(MUTE_KEY, '1')
+    else localStorage.removeItem(MUTE_KEY)
+  } catch {
+    /* storage blocked – the switch then lasts until the page reloads */
+  }
+}
+
 export function notificationsSupported() {
   return typeof window !== 'undefined' && 'Notification' in window
 }

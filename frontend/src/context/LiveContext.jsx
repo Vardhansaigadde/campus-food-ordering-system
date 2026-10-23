@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useAuth } from './AuthContext'
-import { playBeep, playChime, showBrowserNotification } from '../lib/alerts'
+import { alertsMuted, playBeep, playChime, showBrowserNotification } from '../lib/alerts'
 import { isPushActive, syncPush } from '../lib/push'
 
 /**
@@ -57,12 +57,15 @@ export function LiveProvider({ children }) {
         else if (kind === 'success') toast.success(text, { duration: 6000 })
         else toast(text, { duration: 4000 })
       }
-      if (LOUD.has(event.type)) {
-        playChime()
-        // With push on, the service worker shows the system notification instead (no duplicates)
-        if (!isPushActive()) showBrowserNotification(event.title, event.message)
-      } else if (kind) {
-        playBeep()
+      // Alerts switched off on this phone: the on-screen message above is enough
+      if (!alertsMuted()) {
+        if (LOUD.has(event.type)) {
+          playChime()
+          // With push on, the service worker shows the system notification instead (no duplicates)
+          if (!isPushActive()) showBrowserNotification(event.title, event.message)
+        } else if (kind) {
+          playBeep()
+        }
       }
     })
     source.onerror = () => setConnected(false) // EventSource reconnects by itself

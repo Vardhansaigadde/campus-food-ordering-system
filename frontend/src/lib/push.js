@@ -1,4 +1,5 @@
 import { api } from './api'
+import { alertsMuted, setAlertsMuted } from './alerts'
 
 /**
  * Web Push: alerts that arrive with the app closed and the phone locked.
@@ -57,7 +58,7 @@ export async function syncPush() {
     setActive(false)
     return 'denied'
   }
-  if (Notification.permission !== 'granted') {
+  if (Notification.permission !== 'granted' || alertsMuted()) {
     setActive(false)
     return 'off'
   }
@@ -79,8 +80,9 @@ export async function syncPush() {
   return 'on'
 }
 
-/** From a button tap: asks for permission, then subscribes. */
+/** From a button tap: asks for permission, then subscribes. Also undoes "alerts off". */
 export async function enablePush() {
+  setAlertsMuted(false)
   if (!pushSupported()) return 'unsupported'
   const permission = Notification.permission === 'default' ? await Notification.requestPermission() : Notification.permission
   if (permission !== 'granted') {
@@ -110,10 +112,17 @@ export async function disablePush(token) {
   await sub.unsubscribe().catch(() => {})
 }
 
+/** "Alerts off" from the bell: this phone stays quiet and the server stops sending to it. */
+export async function turnOffAlerts(token) {
+  setAlertsMuted(true)
+  await disablePush(token)
+}
+
 /** Current state without side effects – for showing or hiding the "turn on alerts" prompt. */
 export async function pushStatus() {
   if (!pushSupported()) return 'unsupported'
   if (Notification.permission === 'denied') return 'denied'
+  if (alertsMuted()) return 'muted' // switched off on purpose – don't nag
   if (Notification.permission !== 'granted') return 'off'
   const reg = await registration()
   if (!reg) return 'unsupported'
