@@ -1,0 +1,70 @@
+server:
+  port: 8080
+  # Behind Caddy (production) the real phone IP arrives in X-Forwarded-For; the rate limiter needs it
+  forward-headers-strategy: native
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/auth/**,/api/admin/users/**
+
+            - id: restaurant-service
+              uri: lb://restaurant-service
+              predicates:
+                - Path=/api/restaurants/**,/api/favourites/**,/api/restaurant/profile,/api/restaurant/status,/api/restaurant/menu/**,/api/admin/restaurants/**
+
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/orders/**,/api/restaurant/orders/**,/api/admin/orders/**
+
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/notifications/**,/api/announcements/**,/api/admin/announcements/**,/api/admin/audit/**
+
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origin-patterns:
+                  - "http://localhost:*"
+                  - "http://127.0.0.1:*"
+                  - "http://192.168.*.*:*"
+                allowed-methods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+                allowed-headers: "*"
+                exposed-headers: [Content-Disposition]
+                allow-credentials: true
+                max-age: 3600
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    # Pick up new / stopped service copies quickly
+    registry-fetch-interval-seconds: 5
+  instance:
+    hostname: localhost
+
+app:
+  jwt:
+    # Must be the same value as in the Auth Service
+    secret: ${JWT_SECRET:campus-food-dev-jwt-secret-key-change-me-0123456789}
+  security:
+    gateway-key: ${GATEWAY_KEY:cf-gateway-dev-key-change-me}
+  rate-limit:
+    per-user-per-minute: 240
+    login-per-ip-per-minute: 120
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

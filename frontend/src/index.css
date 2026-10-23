@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+/*
+ * Design system: design-system/campus-food/MASTER.md (generated with ui-ux-pro-max)
+ * Style D: soft cards, pill buttons, floating bars · one accent #C2410C on white/warm · Sora + Manrope
+ */
+
+/* Dark mode is switched with a "dark" class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Sora", "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand: one burnt orange used sparingly. 500 is the fill (white text 5.2:1), 600 the text colour. */
+  --color-brand-50: #fff7ed;
+  --color-brand-100: #ffedd5;
+  --color-brand-200: #fed7aa;
+  --color-brand-300: #fdba74;
+  --color-brand-400: #ea580c;
+  --color-brand-500: #c2410c;
+  --color-brand-600: #c2410c;
+  --color-brand-700: #9a3412;
+  --color-brand-800: #7c2d12;
+  --color-brand-900: #431407;
+
+  /* Semantic tokens */
+  --color-ink: #1c1917;
+  --color-cream: #faf8f5;    /* page ground: warm off-white so white cards stand out */
+  --color-line: #eee8e1;     /* card borders */
+  --color-line-strong: #e7e0d8;
+  --color-trust: #2563eb;
+  --color-chart: #c2410c;
+
+  /* Soft depth (style D) – the old hard "block" shadows are gone */
+  --shadow-block: 0 10px 30px rgb(28 25 23 / 0.08);
+  --shadow-block-sm: 0 6px 16px rgb(194 65 12 / 0.28);
+  --shadow-card: 0 4px 16px rgb(28 25 23 / 0.06);
+
+  --animate-pop: pop 0.25s ease-out;
+  --animate-rise: rise 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  --animate-pulse-ring: pulse-ring 1.6s ease-out infinite;
+
+  @keyframes pop {
+    0% { transform: scale(0.96); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes rise {
+    0% { transform: translateY(12px) scale(0.98); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+  }
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgb(194 65 12 / 0.45); }
+    100% { box-shadow: 0 0 0 14px rgb(194 65 12 / 0); }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-cream font-sans text-[15px] leading-relaxed text-ink antialiased sm:text-base dark:bg-slate-950 dark:text-slate-100;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+  /* Tailwind v4 no longer sets a pointer cursor on buttons */
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, label[for], select {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-trust);
+    outline-offset: 2px;
+  }
+  ::selection {
+    @apply bg-brand-100 text-ink;
+  }
+  /* Respect users who turn off animations */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------- surfaces */
+
+@utility card {
+  @apply rounded-[20px] border border-line bg-white shadow-card dark:border-slate-800 dark:bg-slate-900 dark:shadow-none;
+}
+
+/* A larger, lifted surface (hero cards, the pickup pass) */
+@utility blocky {
+  @apply rounded-3xl border border-line bg-white shadow-block dark:border-slate-700 dark:bg-slate-900 dark:shadow-none;
+}
+
+/* ---------------------------------------------------------------- buttons (pills, min 44px touch target) */
+
+@utility btn {
+  @apply inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold
+    transition-[background-color,color,box-shadow,transform,border-color] duration-150 ease-out
+    active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-brand-500 text-white shadow-block-sm hover:bg-brand-700 dark:shadow-none;
+}
+@utility btn-secondary {
+  @apply btn border border-line-strong bg-white text-ink hover:border-ink hover:bg-cream
+    dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-slate-400 dark:hover:bg-slate-700;
+}
+@utility btn-danger {
+  @apply btn bg-red-600 text-white hover:bg-red-700;
+}
+@utility btn-success {
+  @apply btn bg-emerald-700 text-white hover:bg-emerald-800;
+}
+@utility btn-ghost {
+  @apply btn min-w-11 px-3 text-slate-700 hover:bg-brand-50 dark:text-slate-300 dark:hover:bg-slate-800;
+}
+
+/* ---------------------------------------------------------------- forms */
+
+@utility input {
+  @apply min-h-11 w-full rounded-2xl border border-line-strong bg-white px-4 py-2.5 text-base text-ink placeholder-slate-400
+    transition-[border-color,box-shadow] focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 sm:text-sm
+    dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-brand-400;
+}
+@utility label {
+  @apply mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300;
+}
+@utility chip {
+  @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}
+
+/* Orange text that stays readable in both themes */
+@utility text-brand {
+  @apply text-brand-600 dark:text-brand-400;
+}
+
+/* Secondary text: slate-600 on light (7.5:1), slate-400 on dark (≥7:1) */
+@utility text-muted {
+  @apply text-slate-600 dark:text-slate-400;
+}

@@ -1,0 +1,25 @@
+# {$DOMAIN} comes from .env, e.g. campusfood.duckdns.org
+# Caddy fetches and renews the HTTPS certificate by itself.
+{$DOMAIN} {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy api-gateway:8080 {
+			# Live order updates are a never-ending stream; send each event immediately
+			flush_interval -1
+		}
+	}
+
+	handle {
+		root * /srv
+		# React Router: unknown paths load index.html
+		try_files {path} /index.html
+		file_server
+	}
+
+	# index.html and the service worker must never be cached, or phones keep an old app
+	@nocache path / /index.html /sw.js /push-sw.js /registerSW.js /manifest.webmanifest
+	header @nocache Cache-Control "no-cache"
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+}

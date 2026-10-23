@@ -1,0 +1,53 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/auth_db?createDatabaseIfNotExist=true&serverTimezone=Asia/Kolkata
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    hikari:
+      maximum-pool-size: 20
+  jackson:
+    deserialization:
+      # Jackson 3 default is true; missing true/false fields should simply mean false
+      fail-on-null-for-primitives: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000
+            read-timeout: 5000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+
+app:
+  jwt:
+    # Must be the same value in the API Gateway
+    secret: ${JWT_SECRET:campus-food-dev-jwt-secret-key-change-me-0123456789}
+    validity-hours: 12
+  security:
+    gateway-key: ${GATEWAY_KEY:cf-gateway-dev-key-change-me}
+    internal-key: ${INTERNAL_KEY:cf-internal-dev-key-change-me}
+  # The one hidden admin account, created on first start (there is no admin sign-up)
+  admin:
+    name: ${ADMIN_NAME:Administrator}
+    email: ${ADMIN_EMAIL:admin@campusfood.local}
+    password: ${ADMIN_PASSWORD:Admin@123}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

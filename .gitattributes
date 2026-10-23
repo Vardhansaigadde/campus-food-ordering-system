@@ -1,0 +1,5 @@
+# Linux server scripts must keep LF line endings even when edited on Windows
+*.sh text eol=lf
+mvnw text eol=lf
+Caddyfile text eol=lf
+*.bat text eol=crlf

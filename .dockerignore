@@ -1,0 +1,10 @@
+# Context for deploy/web.Dockerfile is the project root; it only needs frontend/ and deploy/
+backend
+docs
+scripts
+design-system
+.claude
+*.pptx
+.env
+frontend/node_modules
+frontend/dist

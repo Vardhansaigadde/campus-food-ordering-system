@@ -1,0 +1,121 @@
+# Campus Food - production stack for one server (Oracle Cloud Always Free)
+#   cp .env.example .env   (fill in every value)
+#   docker compose up -d --build
+# Only Caddy is reachable from the internet (ports 80/443); everything else stays private.
+
+x-service: &service
+  restart: unless-stopped
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  networks: [internal]
+
+x-common-env: &common-env
+  EUREKA_URL: http://eureka-server:8761/eureka
+  EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "5"
+  GATEWAY_KEY: ${GATEWAY_KEY:?set GATEWAY_KEY in .env}
+  INTERNAL_KEY: ${INTERNAL_KEY:?set INTERNAL_KEY in .env}
+
+x-db-env: &db-env
+  DB_HOST: mysql
+  DB_USERNAME: ${DB_USERNAME:?set DB_USERNAME in .env}
+  DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+
+x-needs-db: &needs-db
+  mysql:
+    condition: service_healthy
+  eureka-server:
+    condition: service_started
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Kolkata
+    command: ["--innodb-buffer-pool-size=256M", "--max-connections=200"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./deploy/mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [internal]
+
+  eureka-server:
+    <<: *service
+    build: { context: ./backend, args: { SERVICE: eureka-server } }
+
+  auth-service:
+    <<: *service
+    build: { context: ./backend, args: { SERVICE: auth-service } }
+    depends_on: *needs-db
+    environment:
+      <<: [*common-env, *db-env]
+      EUREKA_INSTANCE_HOSTNAME: auth-service
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+
+  restaurant-service:
+    <<: *service
+    build: { context: ./backend, args: { SERVICE: restaurant-service } }
+    depends_on: *needs-db
+    environment:
+      <<: [*common-env, *db-env]
+      EUREKA_INSTANCE_HOSTNAME: restaurant-service
+
+  order-service:
+    <<: *service
+    build: { context: ./backend, args: { SERVICE: order-service } }
+    depends_on: *needs-db
+    environment:
+      <<: [*common-env, *db-env]
+      EUREKA_INSTANCE_HOSTNAME: order-service
+
+  notification-service:
+    <<: *service
+    build: { context: ./backend, args: { SERVICE: notification-service } }
+    depends_on: *needs-db
+    environment:
+      <<: [*common-env, *db-env]
+      EUREKA_INSTANCE_HOSTNAME: notification-service
+
+  api-gateway:
+    <<: *service
+    build: { context: ./backend, args: { SERVICE: api-gateway } }
+    depends_on: [eureka-server]
+    environment:
+      <<: *common-env
+      EUREKA_INSTANCE_HOSTNAME: api-gateway
+      JWT_SECRET: ${JWT_SECRET}
+
+  web:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: deploy/web.Dockerfile
+    depends_on: [api-gateway]
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [internal]
+
+volumes:
+  mysql-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  internal:

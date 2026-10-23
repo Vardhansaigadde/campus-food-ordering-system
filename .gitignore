@@ -1,0 +1,29 @@
+# Secrets - never commit
+.env
+
+# Android signing key - keep a private backup, never commit
+*.keystore
+*.jks
+
+# Build output
+android/app/build/
+android/build/
+android/.gradle/
+*.apk
+*.aab
+backend/*/target/
+frontend/node_modules/
+frontend/dist/
+
+# Local backups and logs
+backups/
+*.log
+
+# Oracle auto-create log
+scripts/oci_create_server.log
+
+# Private: has the server IP and personal emails - keep only on the laptop
+docs/Server-Migration-Guide.pdf
+
+# Local editor/agent settings
+.claude/

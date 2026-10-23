@@ -1,0 +1,50 @@
+server:
+  port: ${PORT:8083}
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/order_db?createDatabaseIfNotExist=true&serverTimezone=Asia/Kolkata
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    hikari:
+      maximum-pool-size: 20
+  jackson:
+    deserialization:
+      # Jackson 3 default is true; missing true/false fields should simply mean false
+      fail-on-null-for-primitives: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000
+            read-timeout: 5000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+
+app:
+  security:
+    gateway-key: ${GATEWAY_KEY:cf-gateway-dev-key-change-me}
+    internal-key: ${INTERNAL_KEY:cf-internal-dev-key-change-me}
+  order:
+    # Rules agreed for the project
+    max-active-orders: 3
+    max-quantity-per-dish: 7
+    no-show-hours: 3
+    otp-max-attempts: 5
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
