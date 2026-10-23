@@ -18,7 +18,7 @@ function BrandOnPhoto() {
 export default function AuthShell({ title, subtitle, children }) {
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[1.1fr_1fr]">
-      <FoodSlideshow className="h-[38dvh] min-h-60 max-h-96 lg:sticky lg:top-0 lg:h-dvh lg:max-h-none">
+      <FoodSlideshow className="h-[38dvh] min-h-60 max-h-96 max-lg:landscape:h-32 max-lg:landscape:min-h-0 lg:sticky lg:top-0 lg:h-dvh lg:max-h-none">
         <div className="px-5 pt-[max(2.25rem,calc(env(safe-area-inset-top)+1.25rem))] lg:px-10 lg:pt-14">
           <BrandOnPhoto />
         </div>

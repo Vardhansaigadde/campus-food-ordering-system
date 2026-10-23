@@ -66,7 +66,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => setShow((s) => !s)}
-              className="absolute inset-y-0 right-0 px-3 text-muted hover:text-slate-600"
+              className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted hover:text-slate-600"
               aria-label={show ? 'Hide password' : 'Show password'}
             >
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -78,9 +78,9 @@ export default function Login() {
           {busy && <Spinner className="h-4 w-4" />} Log in
         </button>
       </form>
-      <p className="mt-6 text-center text-sm text-muted">
+      <p className="mt-4 text-center text-sm text-muted">
         New here?{' '}
-        <Link to="/register" className="font-semibold text-brand hover:underline">
+        <Link to="/register" className="inline-block py-2 font-semibold text-brand hover:underline">
           Create an account
         </Link>
       </p>
