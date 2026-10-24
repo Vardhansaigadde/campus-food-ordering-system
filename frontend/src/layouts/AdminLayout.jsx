@@ -1,6 +1,6 @@
 import { Suspense, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { FileClock, KeyRound, LayoutDashboard, LogOut, Megaphone, Menu as MenuIcon, Moon, Receipt, Store, Sun, Users } from 'lucide-react'
+import { BadgeCheck, FileClock, KeyRound, LayoutDashboard, LogOut, Megaphone, Menu as MenuIcon, Moon, Receipt, Store, Sun, Users } from 'lucide-react'
 import { Modal, PageLoader } from '../components/ui'
 import Brand from '../components/Brand'
 import HeaderTools from '../components/HeaderTools'
@@ -13,6 +13,7 @@ const LINKS = [
   { to: 'restaurants', label: 'Restaurants', short: 'Canteens', icon: Store },
   { to: 'orders', label: 'All Orders', short: 'Orders', icon: Receipt },
   { to: 'users', label: 'Users', short: 'Users', icon: Users },
+  { to: 'faculty', label: 'Faculty delivery', icon: BadgeCheck },
   { to: 'announcements', label: 'Announcements', icon: Megaphone },
   { to: 'audit', label: 'Audit Log', icon: FileClock },
   { to: 'account', label: 'Change password', icon: KeyRound },

@@ -27,7 +27,17 @@ public final class Requests {
     public record PlaceOrder(@NotNull Long restaurantId,
                              @NotEmpty @Size(max = 30) List<@Valid OrderLine> items,
                              LocalDateTime pickupTime,
-                             @Size(max = 150) String note) {
+                             @Size(max = 150) String note,
+                             @Valid Delivery delivery) {
+    }
+
+    /** Faculty only: deliver to this building and room on the run at {@code run} ("12:45") today. */
+    public record Delivery(@NotNull Long locationId,
+                           @Size(max = 30) String room,
+                           @NotNull @Pattern(regexp = "^[0-9]{2}:[0-9]{2}$", message = "must look like 12:45") String run) {
+    }
+
+    public record StartRun(@NotNull @Pattern(regexp = "^[0-9]{2}:[0-9]{2}$", message = "must look like 12:45") String run) {
     }
 
     public record DishStars(@NotNull Long dishId, @Min(1) @Max(5) int stars) {

@@ -2,35 +2,8 @@ import { useRef, useState } from 'react'
 import { Camera, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api, errorMessage } from '../lib/api'
+import { shrinkPhoto } from '../lib/photos'
 import { FoodImage, Spinner } from './ui'
-
-const MAX_SIDE = 1000 // px – plenty for a menu card, keeps each photo around 100 KB
-
-function loadImage(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file)
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error('This file is not a photo'))
-    img.src = url
-  })
-}
-
-/** Shrinks a phone photo (often 3–8 MB) to a small WebP, or JPEG where WebP can't be made. */
-async function shrink(file) {
-  const img = await loadImage(file)
-  const scale = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight))
-  const canvas = document.createElement('canvas')
-  canvas.width = Math.round(img.naturalWidth * scale)
-  canvas.height = Math.round(img.naturalHeight * scale)
-  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
-  URL.revokeObjectURL(img.src)
-  const toBlob = (type, quality) => new Promise((resolve) => canvas.toBlob(resolve, type, quality))
-  const webp = await toBlob('image/webp', 0.78)
-  if (webp?.type === 'image/webp') return new File([webp], 'photo.webp', { type: 'image/webp' })
-  const jpeg = await toBlob('image/jpeg', 0.8)
-  return new File([jpeg], 'photo.jpg', { type: 'image/jpeg' })
-}
 
 /**
  * "Add photo" for dishes and canteens: take a picture or pick one from the gallery.
@@ -47,7 +20,7 @@ export default function PhotoPicker({ id, value, onChange, uploadPath, alt, kind
     setBusy(true)
     try {
       const body = new FormData()
-      body.append('file', await shrink(file))
+      body.append('file', await shrinkPhoto(file))
       const { data } = await api.post(uploadPath, body)
       onChange(data.url)
     } catch (err) {

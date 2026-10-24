@@ -2,6 +2,9 @@ package com.campusfood.auth.user;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,6 +64,41 @@ public class User {
     /** All-time no-shows, for the admin's no-show list. */
     private int totalNoShows;
 
+    // ---------------------------------------------------------------- faculty delivery
+
+    /** null on accounts created before faculty delivery existed – read through {@link #facultyStatus()}. */
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(length = 12)
+    private FacultyStatus facultyStatus;
+
+    @Column(length = 60)
+    private String department;
+
+    /** Building the food is delivered to (a delivery place managed by the admin in the Restaurant Service). */
+    private Long deliveryLocationId;
+
+    @Column(length = 30)
+    private String deliveryRoom;
+
+    /** File name of the college ID photo while the request waits; deleted once the admin decides. */
+    @Column(length = 40)
+    private String facultyIdPhoto;
+
+    /** Why the request was turned down, shown to the user. */
+    @Column(length = 150)
+    private String facultyNote;
+
+    private LocalDateTime facultyRequestedAt;
+
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public FacultyStatus facultyStatus() {
+        return facultyStatus == null ? FacultyStatus.NONE : facultyStatus;
+    }
+
+    public boolean isFaculty() {
+        return facultyStatus() == FacultyStatus.APPROVED;
+    }
 }

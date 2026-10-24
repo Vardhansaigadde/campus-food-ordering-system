@@ -1,6 +1,6 @@
 import { Suspense, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, ChefHat, ChevronDown, ClipboardList, ListChecks, LogOut, Menu as MenuIcon, Moon, Settings, ShieldCheck, Sun, UtensilsCrossed } from 'lucide-react'
+import { BarChart3, Bike, ChefHat, ChevronDown, ClipboardList, ListChecks, LogOut, Menu as MenuIcon, Moon, Settings, ShieldCheck, Sun, UtensilsCrossed } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Brand from '../components/Brand'
 import HeaderTools from '../components/HeaderTools'
@@ -19,6 +19,7 @@ const LINKS = [
   { to: '/kitchen/orders', label: 'Orders', short: 'Orders', icon: ClipboardList },
   { to: '/kitchen/verify', label: 'Scan & hand over', short: 'Scan', icon: ShieldCheck },
   { to: '/kitchen/menu', label: 'Menu', short: 'Menu', icon: ListChecks },
+  { to: '/kitchen/deliveries', label: 'Deliveries', icon: Bike },
   { to: '/kitchen/summary', label: 'Day summary', icon: BarChart3 },
   { to: '/kitchen/prep', label: 'Kitchen View', icon: ChefHat },
   { to: '/kitchen/settings', label: 'Settings', icon: Settings },

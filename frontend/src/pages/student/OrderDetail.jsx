@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { ArrowLeft, Banknote, CheckCircle2, ChefHat, Clock, PartyPopper, QrCode, Receipt, ShieldAlert, Store } from 'lucide-react'
+import { ArrowLeft, Banknote, Bike, CheckCircle2, ChefHat, Clock, MapPin, PackageCheck, PartyPopper, QrCode, Receipt, ShieldAlert, Store } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api, errorMessage } from '../../lib/api'
 import { useApi, useInterval } from '../../lib/useApi'
@@ -17,11 +17,19 @@ const STEPS = [
   { key: 'COLLECTED', label: 'Collected', icon: CheckCircle2 },
 ]
 
-function Timeline({ status }) {
-  const index = STEPS.findIndex((s) => s.key === status)
+// Faculty delivery: packed → on the delivery run → handed over at the room
+const DELIVERY_STEPS = [
+  { key: 'PLACED', label: 'Placed', icon: Receipt },
+  { key: 'READY', label: 'Packed', icon: PackageCheck, also: ['PREPARING'] },
+  { key: 'ON_THE_WAY', label: 'On the way', icon: Bike },
+  { key: 'COLLECTED', label: 'Delivered', icon: CheckCircle2 },
+]
+
+function Timeline({ status, steps = STEPS }) {
+  const index = steps.findIndex((s) => s.key === status || s.also?.includes(status))
   return (
     <ol className="flex items-center">
-      {STEPS.map((s, i) => {
+      {steps.map((s, i) => {
         const done = i <= index
         const current = i === index
         return (
@@ -34,7 +42,7 @@ function Timeline({ status }) {
               </span>
               <span className={`text-xs font-medium ${done ? 'text-slate-800 dark:text-slate-100' : 'text-muted'}`}>{s.label}</span>
             </div>
-            {i < STEPS.length - 1 && <span className={`mx-1 mb-5 h-1 flex-1 rounded ${i < index ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-700'}`} />}
+            {i < steps.length - 1 && <span className={`mx-1 mb-5 h-1 flex-1 rounded ${i < index ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-700'}`} />}
           </li>
         )
       })}
@@ -55,14 +63,17 @@ export default function OrderDetail() {
     if (String(e.data?.orderId) === String(id) || e.type === 'ORDER_READY') reload({ silent: true })
   })
   useInterval(() => {
-    if (order && ['PLACED', 'PREPARING', 'READY'].includes(order.status)) reload({ silent: true })
+    if (order && ['PLACED', 'PREPARING', 'READY', 'ON_THE_WAY'].includes(order.status)) reload({ silent: true })
   }, 20_000)
 
   if (loading) return <PageLoader />
   if (error) return <ErrorBox message={error} onRetry={reload} />
 
-  const active = ['PLACED', 'PREPARING', 'READY'].includes(order.status)
-  const ready = order.status === 'READY'
+  const active = ['PLACED', 'PREPARING', 'READY', 'ON_THE_WAY'].includes(order.status)
+  // A missed delivery becomes a normal counter pickup
+  const delivery = order.delivery && !order.delivery.missed ? order.delivery : null
+  const ready = order.status === 'READY' && !delivery
+  const onTheWay = order.status === 'ON_THE_WAY'
 
   const cancel = async () => {
     if (!confirm('Cancel this order?')) return
@@ -86,7 +97,17 @@ export default function OrderDetail() {
       </Link>
 
       {active && !ready && (
-        <PushPrompt title="Get an alert when your food is ready" text="We'll notify you even if you close the app or lock your phone." />
+        <PushPrompt
+          title={delivery ? 'Get an alert when your food is on the way' : 'Get an alert when your food is ready'}
+          text="We'll notify you even if you close the app or lock your phone."
+        />
+      )}
+
+      {order.delivery?.missed && active && (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+          <p className="font-semibold">We couldn't find you at {order.delivery.location}, {order.delivery.room}</p>
+          <p className="mt-0.5">Please collect it at {order.restaurantName} with your Order ID and OTP.</p>
+        </div>
       )}
 
       {location.state?.justPlaced && active && (
@@ -99,12 +120,18 @@ export default function OrderDetail() {
       {/* Pickup pass */}
       {active ? (
         <div className={`blocky animate-rise overflow-hidden ${ready ? 'border-emerald-600 ring-4 ring-emerald-600/15' : ''}`}>
-          <div className={`border-b-2 px-5 py-3 text-center text-sm font-bold uppercase tracking-wider ${ready ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-transparent bg-brand-500 text-white'}`}>
-            {ready
-              ? order.pickupTime && new Date(order.pickupTime) > new Date()
-                ? `Confirmed – collect from ${time(order.pickupTime)}`
-                : 'Ready – go to the counter now'
-              : 'Your pickup pass'}
+          <div className={`border-b-2 px-5 py-3 text-center text-sm font-bold uppercase tracking-wider ${ready || onTheWay ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-transparent bg-brand-500 text-white'}`}>
+            {onTheWay
+              ? 'On the way – tell the delivery person your OTP'
+              : delivery
+                ? order.status === 'READY'
+                  ? `Packed – coming with the ${time(delivery.run)} delivery`
+                  : 'Your delivery pass'
+                : ready
+                  ? order.pickupTime && new Date(order.pickupTime) > new Date()
+                    ? `Confirmed – collect from ${time(order.pickupTime)}`
+                    : 'Ready – go to the counter now'
+                  : 'Your pickup pass'}
           </div>
           <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-800">
             <div className="p-5 text-center">
@@ -154,10 +181,10 @@ export default function OrderDetail() {
       )}
 
       {/* Progress + queue */}
-      {['PLACED', 'PREPARING', 'READY', 'COLLECTED'].includes(order.status) && (
+      {['PLACED', 'PREPARING', 'READY', 'ON_THE_WAY', 'COLLECTED'].includes(order.status) && (
         <div className="card space-y-5 p-5">
-          <Timeline status={order.status} />
-          {order.queuePosition && (
+          <Timeline status={order.status} steps={delivery ? DELIVERY_STEPS : STEPS} />
+          {order.queuePosition && !delivery && (
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-slate-50 p-4 text-center dark:bg-slate-800">
                 <p className="text-3xl font-black text-brand">#{order.queuePosition}</p>
@@ -180,8 +207,14 @@ export default function OrderDetail() {
         </div>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
           <Clock className="h-4 w-4" /> Ordered {dateTime(order.createdAt)}
-          {order.pickupTime && <> · Pickup at <b className="text-slate-700 dark:text-slate-200">{time(order.pickupTime)}</b></>}
+          {order.pickupTime && !order.delivery && <> · Pickup at <b className="text-slate-700 dark:text-slate-200">{time(order.pickupTime)}</b></>}
         </p>
+        {order.delivery && (
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+            <MapPin className="h-4 w-4 shrink-0" /> Delivery to{' '}
+            <b className="text-slate-700 dark:text-slate-200">{order.delivery.location}, {order.delivery.room}</b> · {time(order.delivery.run)} run
+          </p>
+        )}
         <ul className="mt-4 divide-y divide-slate-100 dark:divide-slate-800">
           {order.items.map((i) => (
             <li key={i.dishId} className="flex items-center gap-3 py-2.5 text-sm">
@@ -192,13 +225,19 @@ export default function OrderDetail() {
           ))}
         </ul>
         {order.note && <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800">Note: {order.note}</p>}
+        {order.delivery && Number(order.delivery.fee) > 0 && (
+          <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 text-sm dark:border-slate-800">
+            <span className="text-muted">Delivery fee</span>
+            <span className="tabular-nums">{money(order.delivery.fee)}</span>
+          </div>
+        )}
         <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-lg font-bold dark:border-slate-800">
           <span>Total</span>
           <span>{money(order.total)}</span>
         </div>
         {active && (
           <p className="mt-2 flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
-            <Banknote className="h-4 w-4" /> Pay {money(order.total)} in cash at the counter
+            <Banknote className="h-4 w-4" /> Pay {money(order.total)} in cash {delivery ? 'to the delivery person' : 'at the counter'}
           </p>
         )}
         {ready && order.holdMinutes && (

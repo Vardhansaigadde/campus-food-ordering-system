@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { AlertTriangle, KeyRound, UserRound } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api, errorMessage } from '../../lib/api'
@@ -6,6 +7,7 @@ import { useApi } from '../../lib/useApi'
 import { date } from '../../lib/format'
 import { PageHeader, PageLoader, Spinner } from '../../components/ui'
 import HeaderTools from '../../components/HeaderTools'
+import FacultyCard from '../../components/FacultyCard'
 
 export function ChangePassword() {
   const [form, setForm] = useState({ currentPassword: '', newPassword: '' })
@@ -36,7 +38,8 @@ export function ChangePassword() {
 }
 
 export default function Account() {
-  const { data: me, loading } = useApi(() => api.get('/auth/me').then((r) => r.data), [])
+  const { data: me, setData, loading } = useApi(() => api.get('/auth/me').then((r) => r.data), [])
+  const location = useLocation()
   if (loading || !me) return <PageLoader />
   const banned = me.orderBanUntil && new Date(me.orderBanUntil) > new Date()
 
@@ -69,6 +72,7 @@ export default function Account() {
         </div>
         <HeaderTools />
       </div>
+      <FacultyCard me={me} onChange={setData} startOpen={Boolean(location.state?.faculty)} />
       <ChangePassword />
     </div>
   )

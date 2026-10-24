@@ -15,6 +15,14 @@ public interface AuthClient {
     @PostMapping("/internal/users/{id}/no-show")
     void recordNoShow(@PathVariable("id") Long userId);
 
+    @GetMapping("/internal/users/{id}/delivery-profile")
+    DeliveryProfile deliveryProfile(@PathVariable("id") Long userId);
+
     record Eligibility(boolean allowed, String reason) {
+    }
+
+    /** {@code faculty}: approved by the admin, so delivery is allowed. */
+    record DeliveryProfile(boolean faculty, String name, String phone, String department,
+                           Long deliveryLocationId, String deliveryRoom) {
     }
 }

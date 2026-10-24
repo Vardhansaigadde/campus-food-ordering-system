@@ -77,7 +77,7 @@ export default function Orders() {
         <label className="text-xs text-muted">Status
           <select className="input mt-1" value={filters.status} onChange={set('status')}>
             <option value="">All</option>
-            {['PLACED', 'PREPARING', 'READY', 'COLLECTED', 'REJECTED', 'CANCELLED', 'NO_SHOW'].map((s) => <option key={s}>{s}</option>)}
+            {['PLACED', 'PREPARING', 'READY', 'ON_THE_WAY', 'COLLECTED', 'REJECTED', 'CANCELLED', 'NO_SHOW'].map((s) => <option key={s}>{s}</option>)}
           </select>
         </label>
         <label className="col-span-2 text-xs text-muted lg:col-span-1">Search

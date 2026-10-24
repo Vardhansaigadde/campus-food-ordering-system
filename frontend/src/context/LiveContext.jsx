@@ -11,7 +11,7 @@ import { isPushActive, syncPush } from '../lib/push'
 const LiveContext = createContext(null)
 
 /** Events that deserve a sound + popup. */
-const LOUD = new Set(['ORDER_READY', 'NEW_ORDER', 'SOLD_OUT'])
+const LOUD = new Set(['ORDER_READY', 'NEW_ORDER', 'SOLD_OUT', 'ORDER_ON_THE_WAY', 'ORDER_DELIVERY_MISSED'])
 // ORDER_BOOKED (ready-made, nothing to do) has no popup or sound on purpose – it only refreshes the screens
 const TOAST = {
   STOCK_LOW: 'info',
@@ -25,6 +25,11 @@ const TOAST = {
   ORDER_NO_SHOW: 'error',
   NEW_ORDER: 'info',
   ANNOUNCEMENT: 'info',
+  ORDER_ON_THE_WAY: 'success',
+  ORDER_DELIVERY_MISSED: 'error',
+  FACULTY_APPROVED: 'success',
+  FACULTY_REJECTED: 'error',
+  FACULTY_REQUEST: 'info',
 }
 
 export function LiveProvider({ children }) {

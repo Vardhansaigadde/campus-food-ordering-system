@@ -30,3 +30,4 @@ docs/Server-Migration-Guide.pdf
 
 # Photos uploaded while testing locally
 backend/restaurant-service/uploads/
+backend/auth-service/uploads/

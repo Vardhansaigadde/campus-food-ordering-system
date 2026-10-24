@@ -5,6 +5,7 @@ import { api, errorMessage } from '../../lib/api'
 import { useApi } from '../../lib/useApi'
 import { ErrorBox, PageHeader, PageLoader, Spinner } from '../../components/ui'
 import PhotoPicker from '../../components/PhotoPicker'
+import DeliverySettings from '../../components/DeliverySettings'
 import { ChangePassword } from '../student/Account'
 
 export default function Settings() {
@@ -92,6 +93,7 @@ export default function Settings() {
         </div>
         <button className="btn-primary" disabled={saving}>{saving && <Spinner className="h-4 w-4" />} Save</button>
       </form>
+      <DeliverySettings />
       <ChangePassword />
     </div>
   )

@@ -47,6 +47,7 @@ export const STATUS_LABEL = {
   PLACED: 'Placed',
   PREPARING: 'Preparing',
   READY: 'Ready',
+  ON_THE_WAY: 'On the way',
   COLLECTED: 'Collected',
   CANCELLED: 'Cancelled',
   REJECTED: 'Rejected',

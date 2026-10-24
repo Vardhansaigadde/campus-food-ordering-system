@@ -45,7 +45,9 @@ public class PushService {
             "DAY_SUMMARY");              // evening: cash in box, plates, no-shows
     private static final Set<String> PUSH_TYPES = Set.of(
             "NEW_ORDER", "ORDER_CANCELLED", "STOCK_LOW", "SOLD_OUT", "DAY_SUMMARY",
-            "ORDER_READY", "ORDER_REJECTED", "ORDER_NO_SHOW");
+            "ORDER_READY", "ORDER_REJECTED", "ORDER_NO_SHOW",
+            "ORDER_ON_THE_WAY", "ORDER_DELIVERY_MISSED",  // faculty delivery
+            "FACULTY_APPROVED", "FACULTY_REJECTED");
 
     /** Push services we will talk to. Anything else could be used to make this server call arbitrary URLs. */
     private static final List<String> ALLOWED_HOST_SUFFIXES = List.of(
@@ -180,6 +182,7 @@ public class PushService {
         String url = staff
                 ? ("NEW_ORDER".equals(type) || "ORDER_CANCELLED".equals(type) ? "/kitchen/orders"
                         : "DAY_SUMMARY".equals(type) ? "/kitchen/summary" : "/kitchen")
+                : type.startsWith("FACULTY_") ? "/account"
                 : (orderId != null ? "/orders/" + orderId : "/orders");
         Object token = data.get("token");
         byte[] payload = json(Map.of(
@@ -190,7 +193,8 @@ public class PushService {
                 // One notification per order: "ready" replaces "preparing" instead of stacking up
                 "tag", type.startsWith("STOCK") || type.equals("SOLD_OUT") || type.equals("DAY_SUMMARY") ? type + ":" + title
                         : token != null ? token + ":" + (staff ? "staff" : "student") : type,
-                "urgent", "NEW_ORDER".equals(type) || "SOLD_OUT".equals(type) || "ORDER_READY".equals(type)))
+                "urgent", "NEW_ORDER".equals(type) || "SOLD_OUT".equals(type) || "ORDER_READY".equals(type)
+                        || "ORDER_ON_THE_WAY".equals(type) || "ORDER_DELIVERY_MISSED".equals(type)))
                 .getBytes(StandardCharsets.UTF_8);
         for (PushSubscription sub : targets.values()) {
             deliver(sub, payload);

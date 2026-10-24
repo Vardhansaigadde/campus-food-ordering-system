@@ -90,6 +90,21 @@ public class RestaurantOrderController {
         return o;
     }
 
+    /** The delivery person leaves: every order for that run goes "on the way". */
+    @PostMapping("/deliveries/start")
+    public List<OrderView> startRun(@Valid @RequestBody Requests.StartRun body, HttpServletRequest request) {
+        CurrentUser staff = CurrentUser.from(request);
+        List<OrderView> out = workflow.startRun(staff.requireRestaurantId(), body.run());
+        audit.record(staff, "DELIVERY_RUN_STARTED", body.run() + " · " + out.size() + " orders");
+        return out;
+    }
+
+    /** Nobody was in the room – the order becomes a counter pickup. */
+    @PostMapping("/{id}/delivery-missed")
+    public OrderView deliveryMissed(@PathVariable Long id, HttpServletRequest request) {
+        return workflow.deliveryMissed(CurrentUser.from(request).requireRestaurantId(), id);
+    }
+
     @PostMapping("/verify")
     @Operation(summary = "Verify the Order ID (token) + OTP the student tells at the counter, then mark Collected")
     public OrderView verify(@Valid @RequestBody Requests.Verify body, HttpServletRequest request) {

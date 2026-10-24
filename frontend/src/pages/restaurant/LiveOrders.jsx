@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlarmClock, CheckCheck, ChefHat, ClipboardList, Inbox, PackageCheck, ShieldCheck, X } from 'lucide-react'
+import { AlarmClock, Bike, CheckCheck, ChefHat, ClipboardList, Inbox, PackageCheck, ShieldCheck, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api, errorMessage } from '../../lib/api'
 import { useApi, useInterval } from '../../lib/useApi'
@@ -31,7 +31,12 @@ function OrderCard({ order, onAction, busy }) {
         </div>
         <span className="text-right font-bold tabular-nums">{money(order.total)}</span>
       </div>
-      {order.pickupTime && (
+      {order.delivery && !order.delivery.missed && (
+        <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-violet-100 px-2 py-1 text-xs font-bold text-violet-700 dark:bg-violet-500/15 dark:text-violet-300">
+          <Bike className="h-3.5 w-3.5" /> Delivery · {order.delivery.location}, {order.delivery.room} · {time(order.delivery.run)} run
+        </p>
+      )}
+      {order.pickupTime && !(order.delivery && !order.delivery.missed) && (
         <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-purple-100 px-2 py-1 text-xs font-bold text-purple-700 dark:bg-purple-500/15 dark:text-purple-300">
           <AlarmClock className="h-3.5 w-3.5" /> Pre-order · pickup {time(order.pickupTime)}
         </p>

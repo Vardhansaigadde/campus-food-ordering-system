@@ -139,6 +139,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // ---------------------------------------------------------------- background jobs
 
+    /** Delivery orders going out on one run that haven't left yet. */
+    @Query("""
+            select o from FoodOrder o
+            where o.restaurantId = :rid and o.fulfilment = com.campusfood.order.domain.Fulfilment.DELIVERY
+              and o.deliveryRun = :run and o.deliveryMissed = false and o.status in :statuses
+            order by o.deliveryLocation, o.deliveryRoom
+            """)
+    List<Order> findForRun(@Param("rid") Long restaurantId, @Param("run") LocalDateTime run,
+                           @Param("statuses") Collection<OrderStatus> statuses);
+
     @Query("select o.id from FoodOrder o where o.status = com.campusfood.order.domain.OrderStatus.READY and o.readyAt < :before")
     List<Long> findUncollectedReadyIds(@Param("before") LocalDateTime before);
 

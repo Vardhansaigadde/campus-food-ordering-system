@@ -19,7 +19,20 @@ public record OrderView(Long id, String token, Long restaurantId, String restaur
                         boolean otpLocked, LocalDateTime createdAt, LocalDateTime acceptedAt,
                         LocalDateTime readyAt, LocalDateTime collectedAt, LocalDateTime closedAt,
                         Integer queuePosition, Integer etaMinutes, Integer rating, String review,
-                        Integer holdMinutes, boolean cancellable) {
+                        Integer holdMinutes, boolean cancellable, Delivery delivery) {
+
+    /** Only for delivery orders (null for counter pickup). */
+    /** {@code missed}: nobody was in the room, so it became a counter pickup. */
+    public record Delivery(String location, String room, LocalDateTime run, BigDecimal fee, String phone,
+                           LocalDateTime outAt, boolean missed) {
+
+        static Delivery of(Order o) {
+            return o.isDelivery()
+                    ? new Delivery(o.getDeliveryLocation(), o.getDeliveryRoom(), o.getDeliveryRun(), o.getDeliveryFee(),
+                            o.getCustomerPhone(), o.getOutForDeliveryAt(), o.isDeliveryMissed())
+                    : null;
+        }
+    }
 
     public record Item(Long dishId, String name, boolean veg, BigDecimal unitPrice, int quantity,
                        BigDecimal lineTotal, boolean readyMade) {
@@ -49,6 +62,6 @@ public record OrderView(Long id, String token, Long restaurantId, String restaur
                 o.getStudentName(), o.getStatus(), o.getItems().stream().map(Item::of).toList(), o.getTotal(),
                 otp, qr, o.getPickupTime(), o.getNote(), o.getRejectReason(), o.isOtpLocked(), o.getCreatedAt(),
                 o.getAcceptedAt(), o.getReadyAt(), o.getCollectedAt(), o.getClosedAt(), queuePosition, eta,
-                o.getRating(), o.getReview(), o.getHoldMinutes(), o.isCancellableByStudent());
+                o.getRating(), o.getReview(), o.getHoldMinutes(), o.isCancellableByStudent(), Delivery.of(o));
     }
 }

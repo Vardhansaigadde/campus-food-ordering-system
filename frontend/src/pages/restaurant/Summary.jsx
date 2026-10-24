@@ -126,7 +126,7 @@ export default function Summary() {
           <h2 className="font-semibold">Orders</h2>
           <select className="input w-auto py-2" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0) }} aria-label="Filter by status">
             <option value="">All statuses</option>
-            {['PLACED', 'PREPARING', 'READY', 'COLLECTED', 'REJECTED', 'CANCELLED', 'NO_SHOW'].map((x) => <option key={x} value={x}>{x}</option>)}
+            {['PLACED', 'PREPARING', 'READY', 'ON_THE_WAY', 'COLLECTED', 'REJECTED', 'CANCELLED', 'NO_SHOW'].map((x) => <option key={x} value={x}>{x}</option>)}
           </select>
         </div>
         {history.loading ? (

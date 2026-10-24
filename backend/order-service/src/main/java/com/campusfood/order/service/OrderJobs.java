@@ -52,7 +52,9 @@ public class OrderJobs {
         LocalDateTime now = LocalDateTime.now();
         for (Long id : orders.findUncollectedReadyIds(now.minusMinutes(MIN_HOLD_MINUTES))) {
             Order candidate = orders.findById(id).orElse(null);
-            if (candidate == null || now.isBefore(holdDeadline(candidate))) {
+            // Deliveries wait for their run instead; only a missed delivery (now a counter pickup) can be a no-show
+            if (candidate == null || (candidate.isDelivery() && !candidate.isDeliveryMissed())
+                    || now.isBefore(holdDeadline(candidate))) {
                 continue;
             }
             Integer changed = tx.execute(s -> orders.transition(id, EnumSet.of(OrderStatus.READY), OrderStatus.NO_SHOW,

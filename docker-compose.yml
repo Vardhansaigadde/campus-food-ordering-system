@@ -61,6 +61,9 @@ services:
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
       ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      ID_PHOTO_DIR: /data/id-photos
+    volumes:
+      - id-photos:/data/id-photos
 
   restaurant-service:
     <<: *service
@@ -118,6 +121,7 @@ services:
 volumes:
   mysql-data:
   photos:
+  id-photos:
   caddy-data:
   caddy-config:
 

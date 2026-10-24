@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -70,8 +72,10 @@ public class Order {
     @Column(nullable = false, length = 80)
     private String studentName;
 
+    /** Plain text, not a MySQL ENUM, so new statuses don't need a database change (see SchemaFixes). */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 12)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(nullable = false, length = 20)
     private OrderStatus status = OrderStatus.PLACED;
 
     @Column(nullable = false, precision = 10, scale = 2)
@@ -105,6 +109,38 @@ public class Order {
     /** Minutes the food stays reserved once ready (the restaurant's setting when the order was placed). */
     private Integer holdMinutes;
 
+    // ---------------------------------------------------------------- faculty delivery
+
+    /** null on orders from before delivery existed = pickup; read through {@link #isDelivery()}. */
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(length = 10)
+    private Fulfilment fulfilment;
+
+    private Long deliveryLocationId;
+
+    /** Building name as it was when ordering, e.g. "CSE Block". */
+    @Column(length = 60)
+    private String deliveryLocation;
+
+    @Column(length = 30)
+    private String deliveryRoom;
+
+    /** The delivery run this order goes out with (today at e.g. 12:45). */
+    private LocalDateTime deliveryRun;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal deliveryFee;
+
+    /** So the delivery person can call if they can't find the room. */
+    @Column(length = 15)
+    private String customerPhone;
+
+    private LocalDateTime outForDeliveryAt;
+
+    /** Nobody was in the room: the order became a normal counter pickup. */
+    private boolean deliveryMissed;
+
     /** Student's overall rating (1-5) after collecting. */
     private Integer rating;
 
@@ -125,6 +161,10 @@ public class Order {
     public void addItem(OrderItem item) {
         item.setOrder(this);
         items.add(item);
+    }
+
+    public boolean isDelivery() {
+        return fulfilment == Fulfilment.DELIVERY;
     }
 
     /** Only batch-cooked dishes: confirmed and collectable immediately. */

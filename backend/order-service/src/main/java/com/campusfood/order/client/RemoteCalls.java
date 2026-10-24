@@ -67,6 +67,15 @@ public class RemoteCalls {
         }
     }
 
+    public RestaurantClient.DeliveryQuote deliveryQuote(Long restaurantId, Long locationId, String run) {
+        return call("restaurant-service", "Restaurant service",
+                () -> restaurants.deliveryQuote(restaurantId, new RestaurantClient.QuoteRequest(locationId, run)));
+    }
+
+    public AuthClient.DeliveryProfile deliveryProfile(Long userId) {
+        return call("auth-service", "Account service", () -> auth.deliveryProfile(userId));
+    }
+
     public AuthClient.Eligibility eligibility(Long userId) {
         return call("auth-service", "Account service", () -> auth.eligibility(userId));
     }

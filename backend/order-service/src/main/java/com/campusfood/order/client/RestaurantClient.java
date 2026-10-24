@@ -1,6 +1,7 @@
 package com.campusfood.order.client;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -18,6 +19,10 @@ public interface RestaurantClient {
     @PostMapping("/internal/restaurants/{id}/release")
     void release(@PathVariable("id") Long restaurantId, @RequestBody Items items);
 
+    /** Checks the canteen delivers to that building at that run and returns the fee. */
+    @PostMapping("/internal/restaurants/{id}/delivery-quote")
+    DeliveryQuote deliveryQuote(@PathVariable("id") Long restaurantId, @RequestBody QuoteRequest request);
+
     @PostMapping("/internal/ratings")
     void rate(@RequestBody Ratings ratings);
 
@@ -34,6 +39,12 @@ public interface RestaurantClient {
     /** {@code stockLeft}: plates left after this reservation (null = no limit). */
     record Line(Long dishId, String name, boolean veg, BigDecimal unitPrice, int quantity, BigDecimal lineTotal,
                 boolean readyMade, Integer stockLeft) {
+    }
+
+    record QuoteRequest(Long locationId, String run) {
+    }
+
+    record DeliveryQuote(BigDecimal fee, BigDecimal minOrder, String locationName, LocalDateTime runAt) {
     }
 
     record DishRating(Long dishId, int stars) {

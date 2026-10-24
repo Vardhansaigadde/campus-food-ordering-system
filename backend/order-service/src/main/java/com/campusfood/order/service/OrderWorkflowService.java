@@ -115,8 +115,66 @@ public class OrderWorkflowService {
             order.setStatus(OrderStatus.READY);
             order.setReadyAt(now);
         });
-        notifier.toStudent(event(o), "ORDER_READY", "Your order " + o.getToken() + " is READY!",
-                "Go to " + o.getRestaurantName() + " and tell your Order ID and OTP (or show the QR code)");
+        if (o.isDelivery()) {
+            notifier.toStudent(event(o), "ORDER_PREPARING", "Order " + o.getToken() + " is packed",
+                    "It goes out with the " + o.getDeliveryRun().toLocalTime() + " delivery to " + o.getDeliveryLocation());
+        } else {
+            notifier.toStudent(event(o), "ORDER_READY", "Your order " + o.getToken() + " is READY!",
+                    "Go to " + o.getRestaurantName() + " and tell your Order ID and OTP (or show the QR code)");
+        }
+        return OrderView.forStaff(o);
+    }
+
+    // ---------------------------------------------------------------- delivery runs
+
+    /**
+     * The delivery person leaves for one run: every order for that run that isn't out yet goes with
+     * them (also ones nobody tapped "Ready" for – they're packed in the bag), and each customer is told.
+     */
+    public List<OrderView> startRun(Long restaurantId, String run) {
+        LocalDateTime runAt = LocalDate.now().atTime(java.time.LocalTime.parse(run));
+        List<Order> leaving = tx.execute(status -> {
+            List<Order> found = orders.findForRun(restaurantId, runAt,
+                    EnumSet.of(OrderStatus.PLACED, OrderStatus.PREPARING, OrderStatus.READY));
+            LocalDateTime now = LocalDateTime.now();
+            for (Order o : found) {
+                if (o.getAcceptedAt() == null) {
+                    o.setAcceptedAt(now);
+                }
+                if (o.getReadyAt() == null || o.getReadyAt().isAfter(now)) {
+                    o.setReadyAt(now);
+                }
+                o.setStatus(OrderStatus.ON_THE_WAY);
+                o.setOutForDeliveryAt(now);
+                o.getItems().size();
+            }
+            orders.saveAllAndFlush(found);
+            return found;
+        });
+        if (leaving == null || leaving.isEmpty()) {
+            throw ApiException.conflict("No orders waiting for the " + run + " delivery");
+        }
+        for (Order o : leaving) {
+            notifier.toStudent(event(o), "ORDER_ON_THE_WAY", "Order " + o.getToken() + " is on the way",
+                    "Coming to " + o.getDeliveryLocation() + ", " + o.getDeliveryRoom()
+                            + ". Keep your OTP ready for the delivery person.");
+        }
+        return leaving.stream().map(OrderView::forStaff).toList();
+    }
+
+    /** Nobody was in the room: the food goes back to the counter and becomes a normal pickup. */
+    public OrderView deliveryMissed(Long restaurantId, Long orderId) {
+        Order o = update(orderId, order -> {
+            belongsTo(order, restaurantId);
+            requireStatus(order, EnumSet.of(OrderStatus.ON_THE_WAY), "marked as not delivered");
+            order.setStatus(OrderStatus.READY);
+            order.setDeliveryMissed(true);
+            order.setReadyAt(LocalDateTime.now());
+        });
+        int hold = o.getHoldMinutes() == null ? 45 : o.getHoldMinutes();
+        notifier.toStudent(event(o), "ORDER_DELIVERY_MISSED", "We couldn't find you for " + o.getToken(),
+                "Nobody was at " + o.getDeliveryLocation() + ", " + o.getDeliveryRoom() + ". Collect it at "
+                        + o.getRestaurantName() + " within " + hold + " minutes with your OTP.");
         return OrderView.forStaff(o);
     }
 
@@ -212,7 +270,8 @@ public class OrderWorkflowService {
             throw new ApiException(result.status(), result.error());
         }
         Order o = result.order();
-        notifier.toBoth(event(o), "ORDER_COLLECTED", "Order " + o.getToken() + " collected",
+        boolean delivered = o.isDelivery() && !o.isDeliveryMissed();
+        notifier.toBoth(event(o), "ORDER_COLLECTED", "Order " + o.getToken() + (delivered ? " delivered" : " collected"),
                 "Enjoy your meal! You can rate it in My Orders.");
         return OrderView.forStaff(o);
     }

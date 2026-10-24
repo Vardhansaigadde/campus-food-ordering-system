@@ -21,6 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     long countByBlockedTrue();
 
+    List<User> findByFacultyStatusOrderByFacultyRequestedAtAsc(FacultyStatus status);
+
     List<User> findByRestaurantId(Long restaurantId);
 
     @Query("""

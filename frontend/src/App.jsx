@@ -28,6 +28,7 @@ import Settings from './pages/restaurant/Settings'
 const Spending = lazy(() => import('./pages/student/Spending'))
 const VerifyPickup = lazy(() => import('./pages/restaurant/VerifyPickup'))
 const Summary = lazy(() => import('./pages/restaurant/Summary'))
+const Deliveries = lazy(() => import('./pages/restaurant/Deliveries'))
 
 // The admin area is a separate code chunk that is only downloaded on the secret path.
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'))
@@ -40,6 +41,7 @@ const AdminUsers = lazy(() => import('./pages/admin/Users'))
 const AdminAnnouncements = lazy(() => import('./pages/admin/Announcements'))
 const AdminAudit = lazy(() => import('./pages/admin/Audit'))
 const AdminAccount = lazy(() => import('./pages/admin/Account'))
+const AdminFaculty = lazy(() => import('./pages/admin/Faculty'))
 
 /** Only lets the given role in. Students can never open restaurant pages and vice versa. */
 function RequireRole({ role }) {
@@ -91,6 +93,7 @@ export default function App() {
             <Route path="prep" element={<KitchenView />} />
             <Route path="menu" element={<Menu />} />
             <Route path="summary" element={<Summary />} />
+            <Route path="deliveries" element={<Deliveries />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Route>
@@ -106,6 +109,7 @@ export default function App() {
             <Route path={`${ADMIN_BASE}/announcements`} element={<AdminAnnouncements />} />
             <Route path={`${ADMIN_BASE}/audit`} element={<AdminAudit />} />
             <Route path={`${ADMIN_BASE}/account`} element={<AdminAccount />} />
+            <Route path={`${ADMIN_BASE}/faculty`} element={<AdminFaculty />} />
           </Route>
         </Route>
 

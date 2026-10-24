@@ -14,6 +14,11 @@ spring:
     deserialization:
       # Jackson 3 default is true; missing true/false fields should simply mean false
       fail-on-null-for-primitives: false
+  servlet:
+    multipart:
+      # College ID photos are shrunk on the phone; this is only a safety limit
+      max-file-size: 3MB
+      max-request-size: 4MB
   jpa:
     hibernate:
       ddl-auto: update
@@ -35,6 +40,9 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
 
 app:
+  faculty:
+    # Private folder for college ID photos waiting for the admin (deleted after approve/reject)
+    id-photo-dir: ${ID_PHOTO_DIR:./uploads/id-photos}
   jwt:
     # Must be the same value in the API Gateway
     secret: ${JWT_SECRET:campus-food-dev-jwt-secret-key-change-me-0123456789}

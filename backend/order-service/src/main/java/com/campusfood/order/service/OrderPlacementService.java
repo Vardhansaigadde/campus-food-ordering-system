@@ -1,5 +1,6 @@
 package com.campusfood.order.service;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import com.campusfood.order.client.RestaurantClient;
 import com.campusfood.order.common.ApiException;
 import com.campusfood.order.common.CurrentUser;
 import com.campusfood.order.domain.DailyCounterRepository;
+import com.campusfood.order.domain.Fulfilment;
 import com.campusfood.order.domain.Order;
 import com.campusfood.order.domain.OrderItem;
 import com.campusfood.order.domain.OrderRepository;
@@ -82,7 +84,10 @@ public class OrderPlacementService {
         }
 
         List<RestaurantClient.Item> items = mergeAndValidate(req.items());
-        validatePickupTime(req.pickupTime());
+        DeliveryPlan delivery = req.delivery() == null ? null : planDelivery(student, req);
+        if (delivery == null) {
+            validatePickupTime(req.pickupTime());
+        }
 
         AuthClient.Eligibility eligibility = remote.eligibility(student.id());
         if (!eligibility.allowed()) {
@@ -94,9 +99,15 @@ public class OrderPlacementService {
         }
 
         RestaurantClient.Reservation reservation = remote.reserve(req.restaurantId(), items);
+        BigDecimal minOrder = delivery == null ? null : delivery.quote().minOrder();
+        if (minOrder != null && reservation.total().compareTo(minOrder) < 0) {
+            remote.release(req.restaurantId(), items);
+            throw ApiException.badRequest("Minimum order for delivery is ₹" + minOrder.stripTrailingZeros().toPlainString()
+                    + " (your food is ₹" + reservation.total().stripTrailingZeros().toPlainString() + ")");
+        }
         Long orderId;
         try {
-            orderId = tx.execute(status -> save(student, req, key, reservation));
+            orderId = tx.execute(status -> save(student, req, key, reservation, delivery));
         } catch (DataIntegrityViolationException duplicate) {
             remote.release(req.restaurantId(), items);
             if (key != null) {
@@ -114,7 +125,9 @@ public class OrderPlacementService {
         OrderView view = queries.forStudent(orderId, student.id());
         Notifier.OrderEvent event = new Notifier.OrderEvent(view.id(), view.token(), view.restaurantId(), student.id(),
                 view.status().name());
-        String pickup = view.pickupTime() != null ? " · pickup " + view.pickupTime().toLocalTime() : "";
+        String pickup = view.delivery() != null
+                ? " · deliver " + view.delivery().run().toLocalTime() + " to " + view.delivery().location() + " " + view.delivery().room()
+                : view.pickupTime() != null ? " · pickup " + view.pickupTime().toLocalTime() : "";
         List<OrderView.Item> toCook = view.items().stream().filter(i -> !i.readyMade()).toList();
         if (toCook.isEmpty()) {
             // Ready-made only: nothing for the kitchen to do, so no buzz – the board just updates
@@ -146,8 +159,27 @@ public class OrderPlacementService {
         }
     }
 
+    /** Checked before any plates are reserved: approved faculty, building, run still open. */
+    private record DeliveryPlan(RestaurantClient.DeliveryQuote quote, Long locationId, String room, String phone) {
+    }
+
+    private DeliveryPlan planDelivery(CurrentUser student, Requests.PlaceOrder req) {
+        AuthClient.DeliveryProfile profile = remote.deliveryProfile(student.id());
+        if (!profile.faculty()) {
+            throw ApiException.forbidden("Delivery is only for approved faculty. You can ask for it under My account.");
+        }
+        String room = req.delivery().room() == null || req.delivery().room().isBlank()
+                ? profile.deliveryRoom() : req.delivery().room().trim();
+        if (room == null || room.isBlank()) {
+            throw ApiException.badRequest("Enter the room to deliver to");
+        }
+        RestaurantClient.DeliveryQuote quote = remote.deliveryQuote(req.restaurantId(), req.delivery().locationId(),
+                req.delivery().run());
+        return new DeliveryPlan(quote, req.delivery().locationId(), room, profile.phone());
+    }
+
     private Long save(CurrentUser student, Requests.PlaceOrder req, String key,
-                      RestaurantClient.Reservation reservation) {
+                      RestaurantClient.Reservation reservation, DeliveryPlan delivery) {
         LocalDate today = LocalDate.now();
         counters.increment(reservation.restaurantId() + ":" + today);
         long number = counters.lastValue();
@@ -162,6 +194,18 @@ public class OrderPlacementService {
         o.setStudentName(student.name() == null || student.name().isBlank() ? "Student" : student.name());
         o.setTotal(reservation.total());
         o.setPickupTime(req.pickupTime() == null ? null : req.pickupTime().withSecond(0).withNano(0));
+        o.setFulfilment(delivery == null ? Fulfilment.PICKUP : Fulfilment.DELIVERY);
+        if (delivery != null) {
+            // The run time works like a pre-order time: the kitchen view and queue order use it
+            o.setPickupTime(delivery.quote().runAt());
+            o.setDeliveryLocationId(delivery.locationId());
+            o.setDeliveryLocation(delivery.quote().locationName());
+            o.setDeliveryRoom(delivery.room());
+            o.setDeliveryRun(delivery.quote().runAt());
+            o.setDeliveryFee(delivery.quote().fee());
+            o.setCustomerPhone(delivery.phone());
+            o.setTotal(reservation.total().add(delivery.quote().fee()));
+        }
         o.setNote(req.note() == null || req.note().isBlank() ? null : req.note().trim());
         o.setIdempotencyKey(key);
         o.setHoldMinutes(reservation.holdMinutes());

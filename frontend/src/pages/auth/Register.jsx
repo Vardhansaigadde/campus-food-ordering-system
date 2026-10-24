@@ -16,6 +16,7 @@ export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '' })
   const [show, setShow] = useState(false)
+  const [faculty, setFaculty] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -31,7 +32,8 @@ export default function Register() {
     try {
       await register({ name: form.name, email: form.email, phone: form.phone, password: form.password })
       toast.success('Account created – welcome!')
-      navigate('/restaurants', { replace: true })
+      // Faculty finish their request (department, building, ID photo) on the account page
+      navigate(faculty ? '/account' : '/restaurants', { replace: true, state: faculty ? { faculty: true } : undefined })
     } catch (err) {
       setError(errorMessage(err))
     } finally {
@@ -85,6 +87,13 @@ export default function Register() {
             <input id="confirm" type={show ? 'text' : 'password'} required minLength={6} autoComplete="new-password" className="input" value={form.confirm} onChange={set('confirm')} />
           </div>
         </div>
+        <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-line-strong p-3 text-sm dark:border-slate-700">
+          <input type="checkbox" className="mt-0.5 h-5 w-5 accent-brand-500" checked={faculty} onChange={(e) => setFaculty(e.target.checked)} />
+          <span>
+            <b>I am faculty</b>
+            <span className="block text-muted">Get food delivered to your room – you'll add your college ID next.</span>
+          </span>
+        </label>
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">{error}</p>}
         <button className="btn-primary w-full py-3" disabled={busy}>
           {busy && <Spinner className="h-4 w-4" />} Create account
