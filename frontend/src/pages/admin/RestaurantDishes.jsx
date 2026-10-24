@@ -16,6 +16,7 @@ export default function RestaurantDishes() {
     () => ({
       list: `/admin/restaurants/${id}/dishes`,
       create: `/admin/restaurants/${id}/dishes`,
+      photos: '/admin/restaurants/photos',
       item: (d) => `/admin/restaurants/${id}/dishes/${d}`,
       availability: (d) => `/admin/restaurants/${id}/dishes/${d}/availability`,
       all: `/admin/restaurants/${id}/all-availability`,

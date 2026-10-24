@@ -5,6 +5,7 @@ import { api, errorMessage } from '../lib/api'
 import { useApi } from '../lib/useApi'
 import { money } from '../lib/format'
 import { EmptyState, ErrorBox, FoodImage, Modal, PageLoader, Rating, Spinner, Toggle, VegMark } from './ui'
+import PhotoPicker from './PhotoPicker'
 
 const CATEGORIES = ['Breakfast', 'Main Course', 'Rice & Biryani', 'Snacks', 'Chinese', 'South Indian', 'North Indian', 'Beverages', 'Desserts']
 
@@ -233,8 +234,8 @@ export default function MenuManager({ paths }) {
               <textarea id="dish-desc" rows={2} maxLength={300} className="input" value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
             </div>
             <div>
-              <label className="label" htmlFor="dish-img">Image URL <span className="font-normal text-muted">(optional)</span></label>
-              <input id="dish-img" type="url" maxLength={500} className="input" placeholder="https://…" value={editing.imageUrl} onChange={(e) => setEditing({ ...editing, imageUrl: e.target.value })} />
+              <label className="label" htmlFor="dish-img">Photo <span className="font-normal text-muted">(optional)</span></label>
+              <PhotoPicker id="dish-img" value={editing.imageUrl} onChange={(url) => setEditing((d) => ({ ...d, imageUrl: url }))} uploadPath={paths.photos} alt={editing.name} />
             </div>
             <div>
               <label className="label" htmlFor="dish-stock">Usual plates for app orders per day <span className="font-normal text-muted">(empty = no limit)</span></label>

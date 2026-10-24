@@ -11,7 +11,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn -q -DskipTests package \
  && cp target/*-SNAPSHOT.jar /app.jar
 
 FROM eclipse-temurin:21-jre
-RUN useradd --system --no-create-home campusfood
+RUN useradd --system --no-create-home campusfood  && mkdir -p /data/photos && chown campusfood /data/photos
 COPY --from=build /app.jar /app/app.jar
 USER campusfood
 # Kept small so all 6 services + MySQL fit easily on the free server

@@ -69,6 +69,9 @@ services:
     environment:
       <<: [*common-env, *db-env]
       EUREKA_INSTANCE_HOSTNAME: restaurant-service
+      PHOTO_DIR: /data/photos
+    volumes:
+      - photos:/data/photos
 
   order-service:
     <<: *service
@@ -114,6 +117,7 @@ services:
 
 volumes:
   mysql-data:
+  photos:
   caddy-data:
   caddy-config:
 

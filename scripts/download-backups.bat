@@ -28,6 +28,7 @@ if not exist "%DEST%" mkdir "%DEST%"
 
 echo Copying backups from %SERVER% ...
 scp -q -i "%KEY%" "%SERVER%:backups/cf-*.sql.gz" "%DEST%"
+if not errorlevel 1 scp -q -i "%KEY%" "%SERVER%:backups/photos-*.tgz" "%DEST%"
 if errorlevel 1 (
   echo.
   echo FAILED - check the internet, or that the server is running.
@@ -37,7 +38,7 @@ if errorlevel 1 (
 
 echo.
 echo Done. Backups on this laptop (newest last):
-dir /b /od "%DEST%\cf-*.sql.gz"
+dir /b /od "%DEST%\cf-*.sql.gz" "%DEST%\photos-*.tgz"
 echo.
 echo Folder: %DEST%
 echo Tip: upload the newest file to Google Drive now and then.

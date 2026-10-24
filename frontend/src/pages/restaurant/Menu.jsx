@@ -4,6 +4,7 @@ import { PageHeader } from '../../components/ui'
 const PATHS = {
   list: '/restaurant/menu/dishes',
   create: '/restaurant/menu/dishes',
+  photos: '/restaurant/photos',
   item: (id) => `/restaurant/menu/dishes/${id}`,
   availability: (id) => `/restaurant/menu/dishes/${id}/availability`,
   stock: (id) => `/restaurant/menu/dishes/${id}/stock`,

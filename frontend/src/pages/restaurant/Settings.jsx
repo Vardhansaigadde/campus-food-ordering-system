@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { api, errorMessage } from '../../lib/api'
 import { useApi } from '../../lib/useApi'
 import { ErrorBox, PageHeader, PageLoader, Spinner } from '../../components/ui'
+import PhotoPicker from '../../components/PhotoPicker'
 import { ChangePassword } from '../student/Account'
 
 export default function Settings() {
@@ -62,8 +63,8 @@ export default function Settings() {
           <textarea id="desc" rows={2} maxLength={300} className="input" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
         <div>
-          <label className="label" htmlFor="img">Photo URL</label>
-          <input id="img" type="url" maxLength={500} className="input" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
+          <label className="label" htmlFor="img">Canteen photo</label>
+          <PhotoPicker id="img" kind="restaurant" value={form.imageUrl} onChange={(url) => setForm((r) => ({ ...r, imageUrl: url }))} uploadPath="/restaurant/photos" alt={form.name} />
         </div>
         <div>
           <label className="label" htmlFor="hours">Opening hours (shown to students)</label>

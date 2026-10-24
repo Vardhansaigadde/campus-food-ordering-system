@@ -6,6 +6,7 @@ import { api, errorMessage } from '../../lib/api'
 import { useApi } from '../../lib/useApi'
 import { ADMIN_BASE } from '../../config'
 import { EmptyState, ErrorBox, Modal, PageHeader, PageLoader, Rating, RestaurantStatusBadge, Spinner } from '../../components/ui'
+import PhotoPicker from '../../components/PhotoPicker'
 
 const blank = {
   name: '', code: '', location: '', description: '', imageUrl: '', openingHours: '', autoCloseTime: '',
@@ -150,8 +151,8 @@ export default function Restaurants() {
               <input id="r-desc" maxLength={300} className="input" placeholder="South Indian meals, snacks and beverages" {...f('description')} />
             </div>
             <div>
-              <label className="label" htmlFor="r-img">Photo URL</label>
-              <input id="r-img" type="url" maxLength={500} className="input" {...f('imageUrl')} />
+              <label className="label" htmlFor="r-img">Photo</label>
+              <PhotoPicker id="r-img" kind="restaurant" value={form.imageUrl} onChange={(url) => setForm((r) => ({ ...r, imageUrl: url }))} uploadPath="/admin/restaurants/photos" alt={form.name} />
             </div>
             <div>
               <label className="label" htmlFor="r-close">Auto-close time</label>

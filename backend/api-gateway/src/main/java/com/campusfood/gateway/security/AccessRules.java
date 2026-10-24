@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
  *  /api/orders/**, /api/favourites/** STUDENT only
  *  /api/restaurants/**                STUDENT (and ADMIN for checking)
  *  login / register / announcements   public
+ *  GET /api/photos/** (dish photos)    public
  *  everything else under /api         any logged-in user
  * </pre>
  */
@@ -27,7 +28,7 @@ public final class AccessRules {
 
     public static boolean isPublic(HttpMethod method, String path) {
         return (HttpMethod.POST.equals(method) && PUBLIC_POST.contains(path))
-                || (HttpMethod.GET.equals(method) && PUBLIC_GET.contains(path))
+                || (HttpMethod.GET.equals(method) && (PUBLIC_GET.contains(path) || path.startsWith("/api/photos/")))
                 || HttpMethod.OPTIONS.equals(method);
     }
 

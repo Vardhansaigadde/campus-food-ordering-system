@@ -14,6 +14,11 @@ spring:
     deserialization:
       # Jackson 3 default is true; missing true/false fields should simply mean false
       fail-on-null-for-primitives: false
+  servlet:
+    multipart:
+      # Phones shrink photos to ~100 KB before uploading; this is only a safety limit
+      max-file-size: 3MB
+      max-request-size: 3MB
   jpa:
     hibernate:
       ddl-auto: update
@@ -35,6 +40,9 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
 
 app:
+  photos:
+    # Dish / restaurant photos. Docker keeps them in the "photos" volume (see docker-compose.yml)
+    dir: ${PHOTO_DIR:./uploads/photos}
   security:
     gateway-key: ${GATEWAY_KEY:cf-gateway-dev-key-change-me}
     internal-key: ${INTERNAL_KEY:cf-internal-dev-key-change-me}
