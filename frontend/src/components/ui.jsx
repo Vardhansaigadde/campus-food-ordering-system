@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Loader2, Star, Store, UtensilsCrossed, X } from 'lucide-react'
 import { STATUS_LABEL } from '../lib/format'
@@ -202,8 +202,11 @@ export function StatCard({ label, value, hint, icon: Icon, tone = 'brand', class
 
 /** Photo, or an icon placeholder for dishes / restaurants without one (no emoji – design system rule). */
 export function FoodImage({ src, alt, className = '', kind = 'dish' }) {
-  if (src) {
-    return <img src={src} alt={alt} loading="lazy" className={`object-cover ${className}`} onError={(e) => (e.currentTarget.style.display = 'none')} />
+  // A broken link (e.g. a search-page URL instead of a photo) falls back to the placeholder,
+  // so the card keeps its size and nothing slides under the buttons
+  const [failed, setFailed] = useState(null)
+  if (src && failed !== src) {
+    return <img src={src} alt={alt} loading="lazy" className={`object-cover ${className}`} onError={() => setFailed(src)} />
   }
   const Icon = kind === 'restaurant' ? Store : UtensilsCrossed
   return (
