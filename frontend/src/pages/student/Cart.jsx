@@ -80,7 +80,15 @@ export default function Cart() {
       room: options.me.deliveryRoom ?? '',
       run: options.runs[0] ?? '',
     })
+    if (options.runs.length) setMode('delivery')
   }
+  // When today's last delivery stopped taking orders, e.g. "11:45"
+  const lastClose = canDeliver && options.delivery.runs.length
+    ? (() => {
+        const last = options.delivery.runs.map((r) => r.slice(0, 5)).sort().at(-1)
+        return new Date(todayAt(last).getTime() - options.delivery.cutoffMinutes * 60000)
+      })()
+    : null
   const delivering = canDeliver && mode === 'delivery' && place !== null
   const fee = delivering ? Number(options.delivery.fee) : 0
   const minOrder = delivering && options.delivery.minOrder ? Number(options.delivery.minOrder) : 0
@@ -167,19 +175,28 @@ export default function Cart() {
               {[
                 { key: 'pickup', Icon: Store, title: 'Pickup', text: 'Collect at the counter' },
                 { key: 'delivery', Icon: Bike, title: 'Delivery', text: 'To your room (faculty)' },
-              ].map(({ key, Icon, title, text }) => (
-                <button
-                  key={key}
-                  role="radio"
-                  aria-checked={mode === key}
-                  onClick={() => setMode(key)}
-                  className={`rounded-2xl border-2 p-3 text-left ${mode === key ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10' : 'border-slate-200 dark:border-slate-700'}`}
-                >
-                  <p className="flex items-center gap-2 font-semibold"><Icon className="h-4 w-4 text-brand" /> {title}</p>
-                  <p className="text-xs text-muted">{text}</p>
-                </button>
-              ))}
+              ].map(({ key, Icon, title, text }) => {
+                const closed = key === 'delivery' && !options.runs.length
+                return (
+                  <button
+                    key={key}
+                    role="radio"
+                    aria-checked={mode === key}
+                    disabled={closed}
+                    onClick={() => setMode(key)}
+                    className={`rounded-2xl border-2 p-3 text-left disabled:opacity-60 ${mode === key ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10' : 'border-slate-200 dark:border-slate-700'}`}
+                  >
+                    <p className="flex items-center gap-2 font-semibold"><Icon className="h-4 w-4 text-brand" /> {title}</p>
+                    <p className="text-xs text-muted">{closed ? 'Closed for today' : text}</p>
+                  </button>
+                )
+              })}
             </div>
+            {!options.runs.length && lastClose && (
+              <p className="mt-2 text-sm text-amber-700 dark:text-amber-400">
+                Today's deliveries are closed – orders closed at {time(lastClose)}. You can still pick up at the counter.
+              </p>
+            )}
           </div>
           {delivering && (
             <>

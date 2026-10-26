@@ -77,6 +77,29 @@ public class FacultyService {
         return UserDto.of(u);
     }
 
+    /** "I am faculty" tapped: remember it so the app keeps reminding them to verify. Still a student until approved. */
+    @Transactional
+    public UserDto markIntent(Long userId) {
+        User u = get(userId);
+        if (u.getRole() != Role.STUDENT) {
+            throw ApiException.badRequest("Only student/faculty accounts can ask for faculty delivery");
+        }
+        if (u.facultyStatus() == FacultyStatus.NONE || u.facultyStatus() == FacultyStatus.REJECTED) {
+            u.setFacultyStatus(FacultyStatus.NOT_VERIFIED);
+        }
+        return UserDto.of(u);
+    }
+
+    /** "I'm not faculty" – stop the reminder (only before an ID was sent). */
+    @Transactional
+    public UserDto clearIntent(Long userId) {
+        User u = get(userId);
+        if (u.facultyStatus() == FacultyStatus.NOT_VERIFIED) {
+            u.setFacultyStatus(FacultyStatus.NONE);
+        }
+        return UserDto.of(u);
+    }
+
     /** Faculty (approved or waiting) move to another room or building – no new approval needed. */
     @Transactional
     public UserDto changePlace(Long userId, Long locationId, String room) {

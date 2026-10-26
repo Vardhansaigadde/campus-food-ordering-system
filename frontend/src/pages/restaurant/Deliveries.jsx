@@ -28,6 +28,7 @@ const hhmm = (iso) => iso.slice(11, 16)
 
 export default function Deliveries() {
   const { data, setData, loading, error, reload } = useApi(() => api.get('/restaurant/orders/active').then((r) => r.data), [])
+  const { data: settings } = useApi(() => api.get('/restaurant/delivery').then((r) => r.data), [])
   useLiveEvent(['NEW_ORDER', 'ORDER_BOOKED', 'ORDER_CANCELLED', 'ORDER_COLLECTED'], () => reload({ silent: true }))
   useInterval(() => reload({ silent: true }), 30_000)
   const [busy, setBusy] = useState(null)
@@ -93,7 +94,13 @@ export default function Deliveries() {
         <EmptyState
           icon={Bike}
           title="No deliveries waiting"
-          text="Faculty delivery orders for today's runs show up here."
+          text={
+            !settings
+              ? "Faculty delivery orders for today's runs show up here."
+              : settings.enabled
+                ? `Delivery is on – runs at ${settings.runs.join(', ')}, orders close ${settings.cutoffMinutes} min before. Orders appear here when approved faculty choose Delivery.`
+                : 'Faculty delivery is switched off. Turn it on in Settings to get delivery orders.'
+          }
           action={<Link to="/kitchen/settings" className="btn-secondary"><Settings className="h-4 w-4" /> Delivery settings</Link>}
         />
       ) : (
@@ -125,7 +132,7 @@ export default function Deliveries() {
                             <div className="min-w-0">
                               <p className="flex flex-wrap items-center gap-2">
                                 <span className="font-display text-lg font-extrabold">{o.token}</span>
-                                <span className="chip bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"><DoorOpen className="h-3 w-3" /> Room {o.delivery.room}</span>
+                                <span className="chip bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"><DoorOpen className="h-3 w-3" /> {/^\d/.test(o.delivery.room) ? `Room ${o.delivery.room}` : o.delivery.room}</span>
                                 <StatusBadge status={o.status} />
                               </p>
                               <p className="mt-1 text-sm">{o.studentName}</p>

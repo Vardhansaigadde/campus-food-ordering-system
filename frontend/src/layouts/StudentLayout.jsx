@@ -5,6 +5,7 @@ import { Heart, Receipt, ShoppingBag, Store, UserRound, Wallet } from 'lucide-re
 import Brand from '../components/Brand'
 import HeaderTools from '../components/HeaderTools'
 import AnnouncementBar from '../components/AnnouncementBar'
+import FacultyReminder from '../components/FacultyReminder'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 
@@ -57,6 +58,7 @@ export default function StudentLayout() {
           </div>
         </div>
       </header>
+      <FacultyReminder />
 
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Suspense fallback={<PageLoader />}>

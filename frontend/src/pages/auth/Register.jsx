@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import { Eye, EyeOff } from 'lucide-react'
 import AuthShell from './AuthShell'
 import { homeFor, useAuth } from '../../context/AuthContext'
-import { errorMessage } from '../../lib/api'
+import { api, errorMessage } from '../../lib/api'
 import { Spinner } from '../../components/ui'
 import { ADMIN_BASE } from '../../config'
 
@@ -32,6 +32,8 @@ export default function Register() {
     try {
       await register({ name: form.name, email: form.email, phone: form.phone, password: form.password })
       toast.success('Account created – welcome!')
+      // Remember "I am faculty" so the app keeps reminding them to verify (best effort)
+      if (faculty) await api.post('/auth/faculty/intent').catch(() => {})
       // Faculty finish their request (department, building, ID photo) on the account page
       navigate(faculty ? '/account' : '/restaurants', { replace: true, state: faculty ? { faculty: true } : undefined })
     } catch (err) {

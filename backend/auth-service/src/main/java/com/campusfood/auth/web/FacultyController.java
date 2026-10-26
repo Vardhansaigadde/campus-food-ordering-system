@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,6 +66,16 @@ public class FacultyController {
             throw ApiException.badRequest("Enter your room (max 30 letters)");
         }
         return faculty.request(CurrentUser.from(request).id(), department, deliveryLocationId, deliveryRoom, idPhoto);
+    }
+
+    @PostMapping("/api/auth/faculty/intent")
+    public UserDto markIntent(HttpServletRequest request) {
+        return faculty.markIntent(CurrentUser.from(request).id());
+    }
+
+    @DeleteMapping("/api/auth/faculty/intent")
+    public UserDto clearIntent(HttpServletRequest request) {
+        return faculty.clearIntent(CurrentUser.from(request).id());
     }
 
     @PutMapping("/api/auth/faculty/place")

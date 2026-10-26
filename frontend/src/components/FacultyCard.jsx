@@ -32,7 +32,8 @@ function PlaceFields({ locations, value, onChange }) {
 export default function FacultyCard({ me, onChange, startOpen = false }) {
   const { data: locations } = useApi(() => api.get('/locations').then((r) => r.data), [])
   const status = me.facultyStatus ?? 'NONE'
-  const [open, setOpen] = useState(startOpen && (status === 'NONE' || status === 'REJECTED'))
+  const canRequest = status === 'NONE' || status === 'NOT_VERIFIED' || status === 'REJECTED'
+  const [open, setOpen] = useState((startOpen && canRequest) || status === 'NOT_VERIFIED')
   const [editingPlace, setEditingPlace] = useState(false)
   const [form, setForm] = useState({
     department: me.department ?? '',
@@ -49,6 +50,23 @@ export default function FacultyCard({ me, onChange, startOpen = false }) {
   }, [startOpen])
   // Free the preview image when it changes or the card goes away
   useEffect(() => () => photo && URL.revokeObjectURL(photo.preview), [photo])
+
+  const startRequest = async () => {
+    setOpen(true)
+    if (status === 'NONE') {
+      // Remember it, so the reminder shows until they send the ID
+      const { data } = await api.post('/auth/faculty/intent').catch(() => ({ data: null }))
+      if (data) onChange(data)
+    }
+  }
+
+  const notFaculty = async () => {
+    setOpen(false)
+    if (status === 'NOT_VERIFIED') {
+      const { data } = await api.delete('/auth/faculty/intent').catch(() => ({ data: null }))
+      if (data) onChange(data)
+    }
+  }
 
   const placeName = locations?.find((l) => l.id === me.deliveryLocationId)?.name ?? 'your building'
 
@@ -132,7 +150,7 @@ export default function FacultyCard({ me, onChange, startOpen = false }) {
         </>
       )}
 
-      {(status === 'NONE' || status === 'REJECTED') && (
+      {canRequest && (
         <>
           {status === 'REJECTED' && (
             <p className="mt-2 flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">
@@ -142,10 +160,13 @@ export default function FacultyCard({ me, onChange, startOpen = false }) {
           {!open ? (
             <>
               <p className="mt-2 text-sm text-muted">Faculty can get food delivered to their room. Send your college ID once – the canteen office approves it.</p>
-              <button className="btn-primary mt-3" onClick={() => setOpen(true)}>I am faculty</button>
+              <button className="btn-primary mt-3" onClick={startRequest}>I am faculty</button>
             </>
           ) : (
             <form onSubmit={sendRequest} className="mt-3 space-y-3">
+              {status === 'NOT_VERIFIED' && (
+                <p className="text-sm text-muted">Verify with your college ID to get food delivered. Until then you order for pickup, like students.</p>
+              )}
               <label className="block">
                 <span className="label">Department</span>
                 <input required maxLength={60} className="input" placeholder="e.g. CSE" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
@@ -170,7 +191,9 @@ export default function FacultyCard({ me, onChange, startOpen = false }) {
               </div>
               <div className="flex gap-2">
                 <button className="btn-primary" disabled={busy}>{busy && <Spinner className="h-4 w-4" />} Send for approval</button>
-                <button type="button" className="btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
+                <button type="button" className="btn-ghost" onClick={notFaculty}>
+                  {status === 'NOT_VERIFIED' ? "I'm not faculty" : 'Cancel'}
+                </button>
               </div>
             </form>
           )}
