@@ -44,11 +44,7 @@ export default function FacultyReminder() {
           <p className="font-semibold">
             {status === 'REJECTED' ? 'Your faculty request was not approved' : 'Verify that you are faculty'}
           </p>
-          <p className="mt-0.5 text-sm text-muted">
-            {status === 'REJECTED'
-              ? `${me.facultyNote ? `${me.facultyNote}. ` : ''}Send your college ID again to get food delivered. Until then you order for pickup.`
-              : 'Send a photo of your college ID to get food delivered to your room. Until then you order for pickup, like students.'}
-          </p>
+          {status === 'REJECTED' && me.facultyNote && <p className="mt-0.5 text-sm text-muted">{me.facultyNote}</p>}
           <Link to="/account" state={{ faculty: true }} className="btn-primary mt-3">Verify now</Link>
         </div>
         <button className="btn-ghost -mr-2 -mt-2 shrink-0" onClick={hide} aria-label="Hide this reminder for now">
