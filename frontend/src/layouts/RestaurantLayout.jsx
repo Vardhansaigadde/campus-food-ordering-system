@@ -100,8 +100,7 @@ function StatusSwitch() {
         )}
         {sheet === 'all' && <h3 className="mb-1 font-semibold">Too busy? Pause new orders for…</h3>}
         <p className="mb-4 text-sm text-muted">
-          Students can still see the menu but can't place new orders. Orders already placed are not affected. It turns
-          back to Open automatically.
+          New orders pause, then it opens again by itself.
         </p>
         <div className="grid grid-cols-3 gap-2">
           {BUSY_MINUTES.map((m) => (

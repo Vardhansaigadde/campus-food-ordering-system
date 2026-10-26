@@ -147,7 +147,7 @@ export default function MenuManager({ paths }) {
         <EmptyState
           icon={UtensilsCrossed}
           title="No dishes yet"
-          text="Add every dish you make once. Then each day just switch on what's available."
+          text="Add your dishes once."
           action={<button className="btn-primary" onClick={() => setEditing(emptyDish)}><Plus className="h-4 w-4" /> Add first dish</button>}
         />
       ) : (
@@ -240,13 +240,13 @@ export default function MenuManager({ paths }) {
             <div>
               <label className="label" htmlFor="dish-stock">Usual plates for app orders per day <span className="font-normal text-muted">(empty = no limit)</span></label>
               <input id="dish-stock" type="number" min={1} max={1000} className="input" value={editing.dailyStock} onChange={(e) => setEditing({ ...editing, dailyStock: e.target.value })} />
-              <p className="mt-1 text-xs text-muted">Cook 60 and keep 10 aside for walk-ins? Enter 50. Each morning the day starts with this number, and at 0 the dish shows "Sold out".</p>
+              <p className="mt-1 text-xs text-muted">At 0 it shows "Sold out".</p>
             </div>
             <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-slate-200 p-3 dark:border-slate-700">
               <input type="checkbox" className="mt-1 h-5 w-5 accent-emerald-600" checked={editing.readyMade} onChange={(e) => setEditing({ ...editing, readyMade: e.target.checked })} />
               <span>
                 <span className="block text-sm font-semibold">Ready-made (cooked in advance, e.g. biryani)</span>
-                <span className="block text-xs text-muted">Orders are confirmed instantly and you just hand it over. Leave off for food you cook per order (fried rice, starters) – those orders ask you to tap "Ready" once.</span>
+                <span className="block text-xs text-muted">Orders are confirmed instantly.</span>
               </span>
             </label>
             <div className="flex flex-wrap gap-5">

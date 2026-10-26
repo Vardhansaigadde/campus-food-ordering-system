@@ -195,13 +195,10 @@ export default function Today() {
       {offlineAt && (
         <div role="status" className="mb-4 rounded-[20px] border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
           <p className="font-bold">No internet – showing the numbers from {time(new Date(offlineAt))}</p>
-          <p className="mt-0.5">Changes can't be saved until the internet is back. Handovers typed on Scan are kept and confirmed later.</p>
+          <p className="mt-0.5">Changes will be saved when you're back online.</p>
         </div>
       )}
-      <PushPrompt
-        title="Turn on alerts on this phone"
-        text="Get a buzz when something needs cooking, or when a dish is running out – even with the phone locked."
-      />
+      <PushPrompt title="Turn on alerts on this phone" text="Works even when the phone is locked." />
 
       <div className="mb-4 grid grid-cols-3 gap-2">
         <Link to="/kitchen/orders" className="card flex flex-col items-center p-3 text-center">
@@ -224,7 +221,7 @@ export default function Today() {
       <div className="mb-3 flex items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold sm:text-3xl">Today's food</h1>
-          <p className="text-sm text-muted">The big number is what app students can still order. Serve walk-ins from the plates you keep aside – tap −1 only if you give them one of the app plates.</p>
+          <p className="text-sm text-muted">Plates left for app orders.</p>
         </div>
       </div>
 
@@ -232,7 +229,7 @@ export default function Today() {
         <EmptyState
           icon={UtensilsCrossed}
           title="Nothing on today's menu yet"
-          text="Switch on the dishes you're selling today. Students only see those."
+          text="Students only see dishes you switch on."
           action={<Link to="/kitchen/menu" className="btn-primary">Set today's menu</Link>}
         />
       ) : (

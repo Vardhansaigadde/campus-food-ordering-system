@@ -17,7 +17,7 @@ export default function Menu() {
     <>
       <PageHeader
         title="Menu"
-        subtitle="Add all your dishes once. Every morning, switch on what's available today – students only see those."
+        subtitle="Switch on what's available today."
       />
       <MenuManager paths={PATHS} />
     </>

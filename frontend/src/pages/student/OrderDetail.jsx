@@ -99,7 +99,7 @@ export default function OrderDetail() {
       {active && !ready && (
         <PushPrompt
           title={delivery ? 'Get an alert when your food is on the way' : 'Get an alert when your food is ready'}
-          text="We'll notify you even if you close the app or lock your phone."
+          text="Even when your phone is locked."
         />
       )}
 
@@ -113,7 +113,7 @@ export default function OrderDetail() {
       {location.state?.justPlaced && active && (
         <div className="flex animate-pop items-center gap-3 rounded-2xl bg-emerald-50 p-4 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300">
           <PartyPopper className="h-6 w-6 shrink-0" />
-          <p className="text-sm font-medium">Order placed! Keep this screen handy – you need the Order ID and OTP at the counter.</p>
+          <p className="text-sm font-medium">Order placed! Show the Order ID and OTP at the counter.</p>
         </div>
       )}
 
@@ -158,7 +158,6 @@ export default function OrderDetail() {
                 <div className="rounded-2xl bg-white p-4">
                   <QRCodeSVG value={order.qrCode} size={200} level="M" />
                 </div>
-                <p className="mt-2 text-xs text-muted">Staff can scan this instead of typing the OTP</p>
               </div>
             )}
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted">

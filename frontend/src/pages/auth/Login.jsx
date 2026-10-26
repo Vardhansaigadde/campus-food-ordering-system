@@ -37,7 +37,7 @@ export default function Login() {
   }
 
   return (
-    <AuthShell title="Welcome back" subtitle="Log in to order food or manage your restaurant.">
+    <AuthShell title="Welcome back" subtitle="Log in to continue.">
       <form onSubmit={submit} className="space-y-4">
         <div>
           <label className="label" htmlFor="email">Email</label>
@@ -84,7 +84,6 @@ export default function Login() {
           Create an account
         </Link>
       </p>
-      <p className="mt-2 text-center text-xs text-muted">Restaurant staff: use the login given by the canteen office.</p>
     </AuthShell>
   )
 }

@@ -92,7 +92,7 @@ export default function Restaurants() {
         <section className="mb-8">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">Dishes available today</h2>
           {results.length === 0 ? (
-            <p className="text-sm text-muted">No dish matching "{query}" is on today's menus.</p>
+            <p className="text-sm text-muted">No dishes found for "{query}".</p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((d) => (
@@ -117,7 +117,7 @@ export default function Restaurants() {
       ) : error ? (
         <ErrorBox message={error} onRetry={reload} />
       ) : !data.length ? (
-        <EmptyState icon={Store} title="No restaurants yet" text="The canteen office hasn't added any restaurants." />
+        <EmptyState icon={Store} title="No restaurants yet" text="Check back soon." />
       ) : (
         <>
         <h2 className="mb-3 text-lg font-bold">Campus canteens</h2>

@@ -64,11 +64,11 @@ export default function KitchenView() {
 
   return (
     <>
-      <PageHeader title="Kitchen view" subtitle="Made-fresh dishes to cook, added up across all orders. Ready-made dishes are not listed." />
+      <PageHeader title="Kitchen view" subtitle="Made-fresh dishes to cook, added up." />
 
       <h2 className="mb-3 flex items-center gap-2 text-lg font-bold"><ChefHat className="h-5 w-5 text-brand" /> Cook now</h2>
       {now.length === 0 ? (
-        <EmptyState icon={ChefHat} title="Nothing to cook right now" text="New orders will appear here automatically." />
+        <EmptyState icon={ChefHat} title="Nothing to cook right now" text="New orders appear here." />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {now.map((g) => (

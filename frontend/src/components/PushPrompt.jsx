@@ -48,11 +48,11 @@ export default function PushPrompt({ title, text }) {
         <p className="font-semibold">{title}</p>
         {status === 'denied' ? (
           <p className="mt-0.5 text-sm text-muted">
-            Alerts are blocked on this phone. Open your browser's site settings for this app and allow notifications.
+            Alerts are blocked. Allow notifications for this site in your browser settings.
           </p>
         ) : (
           <>
-            <p className="mt-0.5 text-sm text-muted">{text}</p>
+            {text && <p className="mt-0.5 text-sm text-muted">{text}</p>}
             <button className="btn-primary mt-3 w-full sm:w-auto" disabled={busy} onClick={turnOn}>
               {busy && <Spinner className="h-4 w-4" />} Turn on alerts
             </button>

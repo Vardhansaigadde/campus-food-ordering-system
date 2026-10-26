@@ -39,7 +39,7 @@ export default function Summary() {
     <>
       <PageHeader
         title="Day summary"
-        subtitle="End-of-day totals – match the expected cash with your cash box."
+        subtitle="Today's cash and orders."
         actions={<input type="date" className="input w-auto" value={day} max={isoDate()} onChange={(e) => { setDay(e.target.value || isoDate()); setPage(0) }} aria-label="Date" />}
       />
       {summary.loading ? (
@@ -102,7 +102,7 @@ export default function Summary() {
           <div className="mt-4 card p-4 sm:p-5">
             <h2 className="mb-3 font-semibold">Walk-in sales at the counter</h2>
             {w.dishes.length === 0 ? (
-              <p className="text-sm text-muted">No counter sales recorded. Tap "−1 Sold at counter" on the Today screen for each walk-in plate.</p>
+              <p className="text-sm text-muted">No counter sales yet.</p>
             ) : (
               <ul className="divide-y divide-slate-100 text-sm dark:divide-slate-800">
                 {w.dishes.map((d) => (

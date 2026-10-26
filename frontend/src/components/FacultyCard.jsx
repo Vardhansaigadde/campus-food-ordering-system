@@ -145,7 +145,6 @@ export default function FacultyCard({ me, onChange, startOpen = false }) {
           <p className="mt-2 flex items-center gap-2 text-sm text-amber-700 dark:text-amber-400">
             <Clock className="h-4 w-4" /> Waiting for the canteen office to check your ID.
           </p>
-          <p className="mt-1 text-sm text-muted">Meanwhile you can order for pickup as usual.</p>
           {editingPlace ? placeForm : <button className="btn-ghost mt-2 px-0 text-brand" onClick={() => setEditingPlace(true)}>Change building / room</button>}
         </>
       )}
@@ -159,14 +158,11 @@ export default function FacultyCard({ me, onChange, startOpen = false }) {
           )}
           {!open ? (
             <>
-              <p className="mt-2 text-sm text-muted">Faculty can get food delivered to their room. Send your college ID once – the canteen office approves it.</p>
+              <p className="mt-2 text-sm text-muted">Get food delivered to your room. Verify once with your college ID.</p>
               <button className="btn-primary mt-3" onClick={startRequest}>I am faculty</button>
             </>
           ) : (
             <form onSubmit={sendRequest} className="mt-3 space-y-3">
-              {status === 'NOT_VERIFIED' && (
-                <p className="text-sm text-muted">Verify with your college ID to get food delivered. Until then you order for pickup, like students.</p>
-              )}
               <label className="block">
                 <span className="label">Department</span>
                 <input required maxLength={60} className="input" placeholder="e.g. CSE" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
@@ -187,7 +183,7 @@ export default function FacultyCard({ me, onChange, startOpen = false }) {
                     <Camera className="h-4 w-4" /> {photo ? 'Change photo' : 'Add photo'}
                   </button>
                 </div>
-                <p className="mt-1.5 text-xs text-muted">Only the canteen office sees it, and it's deleted after they decide.</p>
+                <p className="mt-1.5 text-xs text-muted">Private – deleted after review.</p>
               </div>
               <div className="flex gap-2">
                 <button className="btn-primary" disabled={busy}>{busy && <Spinner className="h-4 w-4" />} Send for approval</button>

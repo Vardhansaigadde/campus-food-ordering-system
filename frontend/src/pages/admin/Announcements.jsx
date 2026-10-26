@@ -47,7 +47,7 @@ export default function Announcements() {
 
   return (
     <>
-      <PageHeader title="Announcements" subtitle="Shown as a banner to every student and restaurant, instantly." />
+      <PageHeader title="Announcements" subtitle="Shown to everyone instantly." />
       <form onSubmit={post} className="card mb-6 space-y-4 p-5">
         <textarea required maxLength={300} rows={2} className="input" placeholder="e.g. All canteens will be closed on Friday for the festival." value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} aria-label="Message" />
         <div className="flex flex-wrap items-end gap-3">

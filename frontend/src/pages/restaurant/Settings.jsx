@@ -76,12 +76,12 @@ export default function Settings() {
           <div>
             <label className="label" htmlFor="open">Open automatically at</label>
             <input id="open" type="time" className="input" value={form.autoOpenTime} onChange={(e) => setForm({ ...form, autoOpenTime: e.target.value })} />
-            <p className="mt-1 text-xs text-muted">Every morning the canteen opens by itself with the last day's menu and your usual app plates per dish. Change anything on the Today screen if needed.</p>
+            <p className="mt-1 text-xs text-muted">Opens with yesterday's menu.</p>
           </div>
           <div>
             <label className="label" htmlFor="close">Close automatically at</label>
             <input id="close" type="time" className="input" value={form.autoCloseTime} onChange={(e) => setForm({ ...form, autoCloseTime: e.target.value })} />
-            <p className="mt-1 text-xs text-muted">Status switches to Closed at this time every day, and you get the day's cash summary on your phone.</p>
+            <p className="mt-1 text-xs text-muted">Sends you the day's cash summary.</p>
           </div>
         </div>
         <div>
@@ -90,12 +90,12 @@ export default function Settings() {
             {/* Always include the saved value, so an unusual one is shown as it is, not silently replaced */}
             {[...new Set([15, 20, 30, 45, 60, 90, 120, Number(form.holdMinutes)])].sort((a, b) => a - b).map((m) => <option key={m} value={m}>{m < 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? 's' : ''}`}</option>)}
           </select>
-          <p className="mt-1 text-xs text-muted">After this time (from ready, or from the pre-order pickup time) the order is a no-show and the plates go back on sale automatically.</p>
+          <p className="mt-1 text-xs text-muted">Then it's a no-show and the plates go back on sale.</p>
         </div>
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-line p-4 dark:border-slate-700">
           <div>
             <p className="font-semibold">Accept pre-orders</p>
-            <p className="text-sm text-muted">Students can order now for a pickup time later today. Plates are kept for them.</p>
+            <p className="text-sm text-muted">Students order now for a later time today.</p>
           </div>
           <Toggle checked={form.preordersEnabled} onChange={(v) => setForm({ ...form, preordersEnabled: v })} label="Accept pre-orders" />
         </div>

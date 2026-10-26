@@ -24,7 +24,7 @@ export default function Audit() {
 
   return (
     <>
-      <PageHeader title="Audit log" subtitle="Who changed what, and when – collected from every microservice." />
+      <PageHeader title="Audit log" subtitle="Who changed what, and when." />
       <div className="relative mb-4 max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
         <input className="input pl-9" placeholder="Search action, person or details" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search audit log" />

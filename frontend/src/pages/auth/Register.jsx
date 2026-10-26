@@ -44,7 +44,7 @@ export default function Register() {
   }
 
   return (
-    <AuthShell title="Create your account" subtitle="Takes 30 seconds. Then order from any campus restaurant.">
+    <AuthShell title="Create your account" subtitle="Order from any campus canteen.">
       <form onSubmit={submit} className="space-y-4">
         <div>
           <label className="label" htmlFor="name">Full name</label>
@@ -93,7 +93,7 @@ export default function Register() {
           <input type="checkbox" className="mt-0.5 h-5 w-5 accent-brand-500" checked={faculty} onChange={(e) => setFaculty(e.target.checked)} />
           <span>
             <b>I am faculty</b>
-            <span className="block text-muted">Get food delivered to your room – you'll add your college ID next.</span>
+            <span className="block text-muted">Get food delivered to your room.</span>
           </span>
         </label>
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">{error}</p>}

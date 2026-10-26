@@ -198,7 +198,7 @@ export default function Cart() {
             </div>
             {!options.runs.length && lastClose && (
               <p className="mt-2 text-sm text-amber-700 dark:text-amber-400">
-                Today's deliveries are closed – orders closed at {time(lastClose)}. You can still pick up at the counter.
+                Deliveries closed for today (last orders {time(lastClose)}).
               </p>
             )}
           </div>
@@ -303,7 +303,6 @@ export default function Cart() {
           {placing ? <Spinner className="h-5 w-5" /> : null}
           {placing ? 'Placing order…' : `Place order · ${money(grandTotal)}`}
         </button>
-        <p className="mt-2 text-center text-xs text-muted">Final prices are confirmed by the restaurant when you order.</p>
       </div>
     </div>
   )

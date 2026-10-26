@@ -145,13 +145,10 @@ export default function LiveOrders() {
       {offlineAt && (
         <div role="status" className="mb-4 rounded-[20px] border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
           <p className="font-bold">No internet – showing the list from {time(new Date(offlineAt))}</p>
-          <p className="mt-0.5">You can still hand over: type the Order ID + OTP on Scan. It is confirmed automatically when the internet is back.</p>
+          <p className="mt-0.5">You can still hand over on Scan – it syncs when you're back online.</p>
         </div>
       )}
-      <PushPrompt
-        title="Turn on cooking alerts"
-        text="Get a buzz when an order needs cooking (fried rice, starters…) even when this phone is locked. Ready-made orders like biryani need nothing from you until the student arrives."
-      />
+      <PushPrompt title="Turn on alerts for new orders" text="Works even when the phone is locked." />
       {profile.data && profile.data.dishesToday === 0 && (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-500/40 dark:bg-amber-500/10">
           <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
@@ -204,7 +201,7 @@ export default function LiveOrders() {
       </div>
 
       <Modal open={!!rejecting} onClose={() => setRejecting(null)} title={`Reject order ${rejecting?.token ?? ''}`}>
-        <p className="mb-3 text-sm text-muted">The student is notified immediately and the dishes go back into stock.</p>
+        <p className="mb-3 text-sm text-muted">The student is told and the dishes go back on sale.</p>
         <div className="space-y-2">
           {REJECT_REASONS.map((r) => (
             <label key={r} className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">

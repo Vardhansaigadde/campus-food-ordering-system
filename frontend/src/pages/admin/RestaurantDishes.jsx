@@ -29,7 +29,7 @@ export default function RestaurantDishes() {
       <Link to={`${ADMIN_BASE}/restaurants`} className="mb-3 inline-flex items-center gap-1 text-sm text-muted hover:text-brand">
         <ArrowLeft className="h-4 w-4" /> Restaurants
       </Link>
-      <PageHeader title={restaurant ? `${restaurant.name} – dishes` : 'Dishes'} subtitle="Changes apply immediately to the student menu." />
+      <PageHeader title={restaurant ? `${restaurant.name} – dishes` : 'Dishes'} subtitle="Changes are live instantly." />
       <MenuManager paths={paths} />
     </>
   )

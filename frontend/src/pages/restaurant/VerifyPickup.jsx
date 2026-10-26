@@ -135,7 +135,7 @@ export default function VerifyPickup() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <PageHeader title="Verify pickup" subtitle="Ask the student for their Order ID and OTP. Hand over the food only when it matches." />
+      <PageHeader title="Verify pickup" subtitle="Check the Order ID and OTP before handing over." />
 
       <div className="mb-5 grid grid-cols-2 rounded-full bg-slate-200/70 p-1 sm:inline-grid dark:bg-slate-800">
         <button onClick={() => setMode('type')} className={`flex min-h-11 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${mode === 'type' ? 'bg-white shadow dark:bg-slate-900' : 'text-muted'}`}>
@@ -245,7 +245,7 @@ export default function VerifyPickup() {
                   </>
                 ) : (
                   <p className="mt-4 rounded-2xl bg-white/50 p-4 text-lg font-semibold">
-                    This order isn't in the saved list. Ask the student to show the pickup pass on their phone and check the Order ID and name.
+                    Not in the saved list – check the student's pickup pass.
                   </p>
                 )}
                 <p className="mt-4 text-base font-medium">The OTP is checked automatically when the internet is back. If it was wrong you'll get a warning.</p>

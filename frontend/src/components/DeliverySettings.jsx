@@ -67,7 +67,7 @@ export default function DeliverySettings() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 font-semibold"><Bike className="h-5 w-5 text-brand" /> Faculty delivery</h2>
-          <p className="text-sm text-muted">Approved faculty can order food to their room. You deliver on fixed runs.</p>
+          <p className="text-sm text-muted">Deliver to approved faculty on fixed runs.</p>
         </div>
         <Toggle checked={form.enabled} onChange={(v) => setForm({ ...form, enabled: v })} label="Faculty delivery on or off" />
       </div>
@@ -90,7 +90,6 @@ export default function DeliverySettings() {
             </span>
           )}
         </div>
-        <p className="mt-1 text-xs text-muted">One trip per time takes every order for it, e.g. 12:45 and 1:30.</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">

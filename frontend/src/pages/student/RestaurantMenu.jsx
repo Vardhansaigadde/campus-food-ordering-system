@@ -133,7 +133,7 @@ export default function RestaurantMenu() {
       </div>
 
       {dishes.length === 0 ? (
-        <EmptyState icon={UtensilsCrossed} title="No dishes available today" text="This restaurant hasn't put up today's menu yet. Check back soon!" />
+        <EmptyState icon={UtensilsCrossed} title="No dishes available today" text="No menu yet today." />
       ) : shown.length === 0 ? (
         <EmptyState icon={Search} title="Nothing matches your filters" />
       ) : (

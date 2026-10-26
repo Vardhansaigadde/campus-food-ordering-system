@@ -54,7 +54,7 @@ function Requests({ places }) {
     <section className="mb-8">
       <h2 className="mb-3 flex items-center gap-2 text-lg font-bold"><IdCard className="h-5 w-5 text-brand" /> Waiting for approval ({data.length})</h2>
       {!data.length ? (
-        <EmptyState icon={BadgeCheck} title="No requests" text="Faculty requests with their college ID appear here." />
+        <EmptyState icon={BadgeCheck} title="No requests" text="New requests appear here." />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {data.map((r) => (
@@ -123,7 +123,7 @@ function Places({ data, setData }) {
   return (
     <section>
       <h2 className="mb-1 flex items-center gap-2 text-lg font-bold"><Building2 className="h-5 w-5 text-brand" /> Delivery places</h2>
-      <p className="mb-3 text-sm text-muted">Buildings faculty can get food delivered to. Each canteen picks the ones it delivers to.</p>
+      <p className="mb-3 text-sm text-muted">Buildings food can be delivered to.</p>
       <form onSubmit={add} className="mb-3 flex gap-2">
         <input required maxLength={60} className="input" placeholder="e.g. CSE Block" value={name} onChange={(e) => setName(e.target.value)} aria-label="New delivery place" />
         <button className="btn-primary shrink-0" disabled={busy}><Plus className="h-4 w-4" /> Add</button>
@@ -160,7 +160,7 @@ export default function Faculty() {
   const names = Object.fromEntries(places.map((p) => [p.id, p.name]))
   return (
     <>
-      <PageHeader title="Faculty delivery" subtitle="Approve faculty from their college ID, and manage the buildings food is delivered to." />
+      <PageHeader title="Faculty delivery" subtitle="Faculty approvals and delivery places." />
       <Requests places={names} />
       <Places data={places} setData={setPlaces} />
     </>

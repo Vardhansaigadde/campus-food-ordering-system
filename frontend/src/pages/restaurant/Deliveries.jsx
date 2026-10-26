@@ -89,17 +89,17 @@ export default function Deliveries() {
 
   return (
     <>
-      <PageHeader title="Deliveries" subtitle="Faculty orders by delivery time and building" />
+      <PageHeader title="Deliveries" />
       {!runs.length ? (
         <EmptyState
           icon={Bike}
           title="No deliveries waiting"
           text={
             !settings
-              ? "Faculty delivery orders for today's runs show up here."
+              ? 'No delivery orders yet.'
               : settings.enabled
-                ? `Delivery is on – runs at ${settings.runs.join(', ')}, orders close ${settings.cutoffMinutes} min before. Orders appear here when approved faculty choose Delivery.`
-                : 'Faculty delivery is switched off. Turn it on in Settings to get delivery orders.'
+                ? `Runs at ${settings.runs.join(', ')} · orders close ${settings.cutoffMinutes} min before.`
+                : 'Faculty delivery is off. Turn it on in Settings.'
           }
           action={<Link to="/kitchen/settings" className="btn-secondary"><Settings className="h-4 w-4" /> Delivery settings</Link>}
         />

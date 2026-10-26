@@ -82,7 +82,7 @@ export default function Restaurants() {
 
   return (
     <>
-      <PageHeader title="Restaurants" subtitle="Add canteens, create their staff logins and control their status." actions={<button className="btn-primary" onClick={() => setForm(blank)}><Plus className="h-4 w-4" /> Add restaurant</button>} />
+      <PageHeader title="Restaurants" subtitle="Canteens, logins and status." actions={<button className="btn-primary" onClick={() => setForm(blank)}><Plus className="h-4 w-4" /> Add restaurant</button>} />
 
       {data.length === 0 ? (
         <EmptyState icon={Store} title="No restaurants yet" text="Add the first canteen to get started." />

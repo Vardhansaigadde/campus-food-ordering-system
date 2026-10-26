@@ -133,7 +133,7 @@ export default function Users() {
 
   return (
     <>
-      <PageHeader title="Users" subtitle="Students and restaurant staff. Block anyone misusing the system." />
+      <PageHeader title="Users" subtitle="Students and restaurant staff." />
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="inline-flex rounded-full bg-slate-200/70 p-1 dark:bg-slate-800">
           <button onClick={() => { setTab('all'); setPage(0) }} className={`rounded-full px-4 py-2 text-sm font-semibold ${tab === 'all' ? 'bg-white shadow dark:bg-slate-900' : 'text-muted'}`}>All users</button>
@@ -187,7 +187,7 @@ export default function Users() {
       <Modal open={!!pwFor} onClose={() => setPwFor(null)} title={`Reset password – ${pwFor?.name ?? ''}`}>
         <form onSubmit={resetPassword} className="space-y-3">
           <input required minLength={6} className="input" placeholder="New password" aria-label="New password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <p className="text-xs text-muted">Tell the user their new password; they can change it from their account page.</p>
+          <p className="text-xs text-muted">They can change it later in their account.</p>
           <button className="btn-primary w-full" disabled={saving}>{saving && <Spinner className="h-4 w-4" />} Reset password</button>
         </form>
       </Modal>
