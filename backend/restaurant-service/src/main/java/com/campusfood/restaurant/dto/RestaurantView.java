@@ -12,7 +12,7 @@ public record RestaurantView(Long id, String name, String code, String descripti
                              String imageUrl, String openingHours, RestaurantStatus status,
                              LocalDateTime busyUntil, LocalTime autoCloseTime, Double rating, long ratingCount,
                              long dishesToday, boolean active, int holdMinutes, LocalTime autoOpenTime,
-                             Delivery delivery) {
+                             boolean preordersEnabled, Delivery delivery) {
 
     /** Faculty delivery settings – the checkout uses them to offer delivery and list the runs. */
     public record Delivery(boolean enabled, BigDecimal fee, BigDecimal minOrder, List<LocalTime> runs,
@@ -31,6 +31,6 @@ public record RestaurantView(Long id, String name, String code, String descripti
                 r.getImageUrl(), r.getOpeningHours(), status,
                 status == RestaurantStatus.BUSY ? r.getBusyUntil() : null,
                 r.getAutoCloseTime(), r.rating(), r.getRatingCount(), dishesToday, r.isActive(),
-                r.holdMinutesOrDefault(), r.getAutoOpenTime(), Delivery.of(r));
+                r.holdMinutesOrDefault(), r.getAutoOpenTime(), r.isPreordersEnabled(), Delivery.of(r));
     }
 }

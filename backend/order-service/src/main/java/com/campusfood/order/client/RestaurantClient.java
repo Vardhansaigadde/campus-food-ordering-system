@@ -33,7 +33,7 @@ public interface RestaurantClient {
     }
 
     record Reservation(Long restaurantId, String restaurantName, String restaurantCode, List<Line> lines,
-                       BigDecimal total, int holdMinutes) {
+                       BigDecimal total, int holdMinutes, boolean preordersEnabled) {
     }
 
     /** {@code stockLeft}: plates left after this reservation (null = no limit). */

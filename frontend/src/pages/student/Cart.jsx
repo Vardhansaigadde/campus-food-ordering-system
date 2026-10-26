@@ -46,16 +46,17 @@ function openRuns(delivery) {
  */
 function useDeliveryOptions(restaurantId) {
   const { data } = useApi(async () => {
-    const me = (await api.get('/auth/me')).data
-    if (me.facultyStatus !== 'APPROVED' || !restaurantId) return null
-    const [menu, places] = await Promise.all([
+    if (!restaurantId) return null
+    const [me, menu] = await Promise.all([
+      api.get('/auth/me').then((r) => r.data),
       api.get(`/restaurants/${restaurantId}`).then((r) => r.data),
-      api.get('/locations').then((r) => r.data),
     ])
+    const preorders = Boolean(menu.restaurant.preordersEnabled)
     const delivery = menu.restaurant.delivery
-    if (!delivery?.enabled) return { me, available: false }
+    if (me.facultyStatus !== 'APPROVED' || !delivery?.enabled) return { me, preorders, available: false }
+    const places = (await api.get('/locations')).data
     const locations = places.filter((p) => delivery.locationIds.includes(p.id))
-    return { me, available: locations.length > 0, delivery, locations, runs: openRuns(delivery) }
+    return { me, preorders, available: locations.length > 0, delivery, locations, runs: openRuns(delivery) }
   }, [restaurantId])
   return data
 }
@@ -94,6 +95,9 @@ export default function Cart() {
   const minOrder = delivering && options.delivery.minOrder ? Number(options.delivery.minOrder) : 0
   const belowMin = delivering && cart.total < minOrder
   const grandTotal = cart.total + fee
+  // Pre-ordering only when the canteen accepts it (unknown while loading = hidden)
+  const preorders = Boolean(options?.preorders)
+  if (!preorders && when !== 'now') setWhen('now')
 
   // Same key for retries of the same checkout => the server never creates a duplicate order.
   // A new key is made only when the cart, pickup time, delivery or note changes.
@@ -238,7 +242,8 @@ export default function Cart() {
       )}
 
       <div className="card mt-4 space-y-4 p-4">
-        {!delivering && <div>
+        {/* Only canteens that accept pre-orders get the "when" question; otherwise it's always as soon as possible */}
+        {!delivering && preorders && <div>
           <p className="label flex items-center gap-2"><Clock className="h-4 w-4" /> When do you want to pick up?</p>
           <div className="grid gap-2 sm:grid-cols-2">
             <button

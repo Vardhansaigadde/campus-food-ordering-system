@@ -53,7 +53,8 @@ public final class Requests {
             @Size(max = 60) String openingHours,
             LocalTime autoCloseTime,
             @Min(10) @Max(240) Integer holdMinutes,
-            LocalTime autoOpenTime) {
+            LocalTime autoOpenTime,
+            Boolean preordersEnabled) {
     }
 
     public record ChangeStatus(@NotNull RestaurantStatus status, @Min(5) @Max(120) Integer busyMinutes) {

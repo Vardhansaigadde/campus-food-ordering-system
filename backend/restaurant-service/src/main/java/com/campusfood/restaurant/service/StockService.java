@@ -86,7 +86,8 @@ public class StockService {
                     d.isReadyMade(), left));
             total = total.add(lineTotal);
         }
-        return new ReservationResult(r.getId(), r.getName(), r.getCode(), lines, total, r.holdMinutesOrDefault());
+        return new ReservationResult(r.getId(), r.getName(), r.getCode(), lines, total, r.holdMinutesOrDefault(),
+                r.isPreordersEnabled());
     }
 
     /** Puts plates back after a cancel / reject (only affects today's stock). */

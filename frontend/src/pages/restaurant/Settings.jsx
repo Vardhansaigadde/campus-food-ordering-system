@@ -3,7 +3,7 @@ import { Store } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api, errorMessage } from '../../lib/api'
 import { useApi } from '../../lib/useApi'
-import { ErrorBox, PageHeader, PageLoader, Spinner } from '../../components/ui'
+import { ErrorBox, PageHeader, PageLoader, Spinner, Toggle } from '../../components/ui'
 import PhotoPicker from '../../components/PhotoPicker'
 import DeliverySettings from '../../components/DeliverySettings'
 import { ChangePassword } from '../student/Account'
@@ -22,6 +22,7 @@ export default function Settings() {
         autoCloseTime: data.autoCloseTime ? data.autoCloseTime.slice(0, 5) : '',
         autoOpenTime: data.autoOpenTime ? data.autoOpenTime.slice(0, 5) : '',
         holdMinutes: data.holdMinutes ?? 45,
+        preordersEnabled: Boolean(data.preordersEnabled),
       })
     }
   }, [data])
@@ -90,6 +91,13 @@ export default function Settings() {
             {[...new Set([15, 20, 30, 45, 60, 90, 120, Number(form.holdMinutes)])].sort((a, b) => a - b).map((m) => <option key={m} value={m}>{m < 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? 's' : ''}`}</option>)}
           </select>
           <p className="mt-1 text-xs text-muted">After this time (from ready, or from the pre-order pickup time) the order is a no-show and the plates go back on sale automatically.</p>
+        </div>
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-line p-4 dark:border-slate-700">
+          <div>
+            <p className="font-semibold">Accept pre-orders</p>
+            <p className="text-sm text-muted">Students can order now for a pickup time later today. Plates are kept for them.</p>
+          </div>
+          <Toggle checked={form.preordersEnabled} onChange={(v) => setForm({ ...form, preordersEnabled: v })} label="Accept pre-orders" />
         </div>
         <button className="btn-primary" disabled={saving}>{saving && <Spinner className="h-4 w-4" />} Save</button>
       </form>

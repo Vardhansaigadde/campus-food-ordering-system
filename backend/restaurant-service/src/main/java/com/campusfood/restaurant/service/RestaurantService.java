@@ -128,6 +128,9 @@ public class RestaurantService {
         if (req.holdMinutes() != null) {
             r.setHoldMinutes(req.holdMinutes());
         }
+        if (req.preordersEnabled() != null) {
+            r.setPreordersEnabled(req.preordersEnabled());
+        }
         r.setAutoOpenTime(req.autoOpenTime());
         // A new auto-open time later today should still fire today
         if (req.autoOpenTime() != null && LocalTime.now().isBefore(req.autoOpenTime())) {

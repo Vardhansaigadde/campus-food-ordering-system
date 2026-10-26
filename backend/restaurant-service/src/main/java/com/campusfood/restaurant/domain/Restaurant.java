@@ -84,6 +84,9 @@ public class Restaurant {
      */
     private Integer holdMinutes;
 
+    /** Students may pre-order for a later pickup time today (the owner switches it on). Off by default. */
+    private boolean preordersEnabled;
+
     // ---------------------------------------------------------------- faculty delivery
 
     /** The canteen delivers to approved faculty (the owner switches it on in Settings). */

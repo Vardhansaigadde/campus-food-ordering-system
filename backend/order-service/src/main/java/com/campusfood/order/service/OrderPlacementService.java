@@ -99,6 +99,10 @@ public class OrderPlacementService {
         }
 
         RestaurantClient.Reservation reservation = remote.reserve(req.restaurantId(), items);
+        if (delivery == null && req.pickupTime() != null && !reservation.preordersEnabled()) {
+            remote.release(req.restaurantId(), items);
+            throw ApiException.badRequest(reservation.restaurantName() + " is not taking pre-orders right now. Order for as soon as possible instead.");
+        }
         BigDecimal minOrder = delivery == null ? null : delivery.quote().minOrder();
         if (minOrder != null && reservation.total().compareTo(minOrder) < 0) {
             remote.release(req.restaurantId(), items);
